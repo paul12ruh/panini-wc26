@@ -4,10 +4,12 @@ import Dashboard  from './pages/Dashboard'
 import Album      from './pages/Album'
 import Missing    from './pages/Missing'
 import Duplicates from './pages/Duplicates'
+import VoiceInput from './components/VoiceInput'
 import { useCollection } from './hooks/useCollection'
 
 export default function App() {
   const [page, setPage] = useState('dashboard')
+  const [focusSection, setFocusSection] = useState(null)
   const {
     collection, get, toggle,
     setQty, setRarity,
@@ -27,11 +29,20 @@ export default function App() {
           owned={owned}
           duplicates={duplicates}
           setPage={setPage}
+          setFocusSection={setFocusSection}
         />
       )}
-      {page === 'album'   && <Album     {...sharedProps} />}
+      {page === 'album'   && (
+        <Album
+          {...sharedProps}
+          focusSection={focusSection}
+          setFocusSection={setFocusSection}
+        />
+      )}
       {page === 'missing' && <Missing   collection={collection} />}
       {page === 'dupes'   && <Duplicates collection={collection} />}
+
+      <VoiceInput collection={collection} onMark={toggle} />
     </>
   )
 }

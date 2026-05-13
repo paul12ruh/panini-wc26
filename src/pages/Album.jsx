@@ -1,13 +1,41 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { SECTIONS, CONFEDERATIONS } from '../data/stickers'
 import StickerSlot from '../components/StickerSlot'
 
-export default function Album({ collection, get, toggle, setQty, setRarity }) {
-  const [search,   setSearch]   = useState('')
-  const [filter,   setFilter]   = useState('All')
-  const [expanded, setExpanded] = useState({})
+export default function Album({ collection, get, toggle, setQty, setRarity, focusSection, setFocusSection }) {
+  const [search,      setSearch]      = useState('')
+  const [filter,      setFilter]      = useState('All')
+  const [expanded,    setExpanded]    = useState({})
+  const [allExpanded, setAllExpanded] = useState(false)
 
   const toggle_section = (id) => setExpanded(p => ({ ...p, [id]: !p[id] }))
+
+  // Deep-link: expand and scroll to focusSection when set
+  useEffect(() => {
+    if (!focusSection) return
+    const match = SECTIONS.find(s => s.id === focusSection)
+    if (!match) { setFocusSection(null); return }
+    setExpanded(p => ({ ...p, [focusSection]: true }))
+    // Use a small timeout to let the DOM update before scrolling
+    const timer = setTimeout(() => {
+      const el = document.getElementById(`section-${focusSection}`)
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      setFocusSection(null)
+    }, 80)
+    return () => clearTimeout(timer)
+  }, [focusSection, setFocusSection])
+
+  // Expand-all / Collapse-all handler
+  const handleToggleAll = () => {
+    if (allExpanded) {
+      setExpanded({})
+    } else {
+      const all = {}
+      filtered.forEach(s => { all[s.id] = true })
+      setExpanded(all)
+    }
+    setAllExpanded(p => !p)
+  }
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim()
@@ -42,6 +70,9 @@ export default function Album({ collection, get, toggle, setQty, setRarity }) {
             onChange={e => setSearch(e.target.value)}
           />
         </div>
+        <button className="btn btn-ghost" onClick={handleToggleAll}>
+          {allExpanded ? 'Collapse all' : 'Expand all'}
+        </button>
         <div className="filter-chips">
           {['All', 'Intro', ...CONFEDERATIONS].map(f => (
             <button
@@ -62,7 +93,7 @@ export default function Album({ collection, get, toggle, setQty, setRarity }) {
           const isOpen     = expanded[section.id]
 
           return (
-            <div key={section.id} className="team-section glass">
+            <div key={section.id} id={`section-${section.id}`} className="team-section glass">
               <div
                 className="team-section-header"
                 onClick={() => toggle_section(section.id)}

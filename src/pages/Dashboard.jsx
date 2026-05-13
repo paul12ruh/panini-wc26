@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { SECTIONS, TOTAL, ALL_STICKERS } from '../data/stickers'
 
-export default function Dashboard({ collection, owned, duplicates, setPage }) {
+export default function Dashboard({ collection, owned, duplicates, setPage, setFocusSection }) {
   const needed = TOTAL - owned
   const pct    = TOTAL ? ((owned / TOTAL) * 100).toFixed(1) : 0
 
@@ -87,7 +87,7 @@ export default function Dashboard({ collection, owned, duplicates, setPage }) {
                 <div
                   key={ts.id}
                   className={`team-tile glass ${ts.pct === 100 ? 'complete' : ''}`}
-                  onClick={() => setPage('album')}
+                  onClick={() => { setFocusSection(ts.id); setPage('album') }}
                   title={`${ts.name}: ${ts.ownedCount}/${ts.stickers.length}`}
                 >
                   <div className="team-tile-flag">{ts.flag}</div>
@@ -133,7 +133,7 @@ export default function Dashboard({ collection, owned, duplicates, setPage }) {
           <div className="card glass">
             <div className="section-title">Most Complete</div>
             {topTeams.map((ts, i) => (
-              <div key={ts.id} className="top-team-row" onClick={() => setPage('album')}>
+              <div key={ts.id} className="top-team-row" onClick={() => { setFocusSection(ts.id); setPage('album') }}>
                 <span className="top-team-rank">#{i + 1}</span>
                 <span className="top-team-flag">{ts.flag}</span>
                 <span className="top-team-name">{ts.name}</span>
