@@ -14,16 +14,16 @@ Owners:
 
 ## Open
 
-- [ ] [dev] Add mobile quick-add mode — create a phone-first flow for rapidly entering team/number stickers without relying on browser voice support
-- [ ] [dev] Add pack-opening session mode — let the user enter a batch of new stickers, review duplicates/new hits, then commit the pack
-- [ ] [dev] Add trade/share mode — generate a clean shareable missing/duplicates view for trading with other collectors
-- [ ] [dev] Add recent activity and undo history — show recent sticker changes and allow reverting more than the current voice undo toast
-- [ ] [dev] Add collection insights — show useful “cool stats” such as hardest-hit teams, duplicate concentration, variant counts, and progress trends
 - [ ] [future] Shared albums for collaborative collecting — use the planned album/member schema so multiple signed-in users can share one collection with roles, invites, and conflict-safe edits
 - [ ] [future] Native iPhone app for voice input — Web Speech API doesn't work on iOS Safari. Separate React Native / Expo project that reads/writes the same Supabase `collections` table via the user's session
 
 ## Done
 
+- [x] 2026-05-13 — Add collection insights
+- [x] 2026-05-13 — Add recent activity and undo history
+- [x] 2026-05-13 — Add trade/share mode
+- [x] 2026-05-13 — Add pack-opening session mode
+- [x] 2026-05-13 — Add mobile quick-add mode
 - [x] 2026-05-13 — Track per-sticker color variants while keeping duplicate counts based on total quantity
 - [x] 2026-05-13 — Review phone web UX and document current mobile behavior
 - [x] 2026-05-13 — Add cool feature ideas backlog

@@ -3,6 +3,7 @@ import { ALL_STICKERS } from '../data/stickers'
 
 const STORAGE_KEY = 'panini-wc2026'
 const STORAGE_META_KEY = `${STORAGE_KEY}:meta`
+const ACTIVITY_KEY = `${STORAGE_KEY}:activity`
 const RARITY_ORDER = ['base', 'blue', 'red', 'purple', 'green', 'black']
 const VALID_RARITIES = new Set(RARITY_ORDER)
 const STICKER_IDS = ALL_STICKERS.map(sticker => sticker.id)
@@ -85,11 +86,28 @@ const loadMeta = () => {
   }
 }
 
+const loadActivity = () => {
+  try {
+    const activity = JSON.parse(localStorage.getItem(ACTIVITY_KEY))
+    return Array.isArray(activity) ? activity.slice(0, 30) : []
+  } catch {
+    return []
+  }
+}
+
 const save = (data, updatedAt = new Date().toISOString()) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
   localStorage.setItem(STORAGE_META_KEY, JSON.stringify({ updatedAt }))
   return updatedAt
 }
+
+const saveActivity = (activity) => {
+  localStorage.setItem(ACTIVITY_KEY, JSON.stringify(activity.slice(0, 30)))
+}
+
+const createActivityId = () => (
+  crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`
+)
 
 // collection shape: { [stickerId]: { qty: number, rarity: highest owned color, variants: { [rarity]: number } } }
 // a sticker is "owned" when qty >= 1
@@ -97,6 +115,7 @@ const save = (data, updatedAt = new Date().toISOString()) => {
 export function useCollection() {
   const [collection, setCollection] = useState(load)
   const [lastUpdatedAt, setLastUpdatedAt] = useState(() => loadMeta().updatedAt || null)
+  const [activity, setActivity] = useState(loadActivity)
 
   const get = useCallback((id) => collection[id] || { qty: 0, rarity: 'base', variants: emptyVariants() }, [collection])
 
@@ -110,6 +129,19 @@ export function useCollection() {
         next[id] = makeEntry({ base: 1 })
       }
       setLastUpdatedAt(save(next))
+      const item = {
+        id: createActivityId(),
+        stickerId: id,
+        action: next[id] ? 'Marked base sticker' : 'Unmarked sticker',
+        before: prev[id] || null,
+        after: next[id] || null,
+        createdAt: new Date().toISOString(),
+      }
+      setActivity(prevActivity => {
+        const updated = [item, ...prevActivity].slice(0, 30)
+        saveActivity(updated)
+        return updated
+      })
       return next
     })
   }, [])
@@ -141,6 +173,19 @@ export function useCollection() {
         if (entry) next[id] = entry
       }
       setLastUpdatedAt(save(next))
+      const item = {
+        id: createActivityId(),
+        stickerId: id,
+        action: `Set total quantity to ${normalizedQty}`,
+        before: prev[id] || null,
+        after: next[id] || null,
+        createdAt: new Date().toISOString(),
+      }
+      setActivity(prevActivity => {
+        const updated = [item, ...prevActivity].slice(0, 30)
+        saveActivity(updated)
+        return updated
+      })
       return next
     })
   }, [])
@@ -154,6 +199,19 @@ export function useCollection() {
       if (!entry) return prev
       const next = { ...prev, [id]: entry }
       setLastUpdatedAt(save(next))
+      const item = {
+        id: createActivityId(),
+        stickerId: id,
+        action: `Added ${rarity} variant`,
+        before: prev[id] || null,
+        after: next[id],
+        createdAt: new Date().toISOString(),
+      }
+      setActivity(prevActivity => {
+        const updated = [item, ...prevActivity].slice(0, 30)
+        saveActivity(updated)
+        return updated
+      })
       return next
     })
   }, [])
@@ -171,7 +229,41 @@ export function useCollection() {
         delete next[id]
       }
       setLastUpdatedAt(save(next))
+      const item = {
+        id: createActivityId(),
+        stickerId: id,
+        action: `Set ${rarity} quantity to ${cleanQty(qty)}`,
+        before: prev[id] || null,
+        after: next[id] || null,
+        createdAt: new Date().toISOString(),
+      }
+      setActivity(prevActivity => {
+        const updated = [item, ...prevActivity].slice(0, 30)
+        saveActivity(updated)
+        return updated
+      })
       return next
+    })
+  }, [])
+
+  const undoLastActivity = useCallback(() => {
+    setActivity(prevActivity => {
+      const [last, ...rest] = prevActivity
+      if (!last) return prevActivity
+
+      setCollection(prev => {
+        const next = { ...prev }
+        if (last.before) {
+          next[last.stickerId] = last.before
+        } else {
+          delete next[last.stickerId]
+        }
+        setLastUpdatedAt(save(next))
+        return next
+      })
+
+      saveActivity(rest)
+      return rest
     })
   }, [])
 
@@ -208,5 +300,20 @@ export function useCollection() {
   const owned = STICKER_IDS.filter(id => collection[id]?.qty > 0).length
   const duplicates = STICKER_IDS.reduce((sum, id) => sum + Math.max(0, (collection[id]?.qty || 0) - 1), 0)
 
-  return { collection, get, toggle, setQty, setRarity, setVariantQty, exportJSON, importJSON, owned, duplicates, loadCollection, lastUpdatedAt }
+  return {
+    collection,
+    get,
+    toggle,
+    setQty,
+    setRarity,
+    setVariantQty,
+    exportJSON,
+    importJSON,
+    owned,
+    duplicates,
+    loadCollection,
+    lastUpdatedAt,
+    activity,
+    undoLastActivity,
+  }
 }

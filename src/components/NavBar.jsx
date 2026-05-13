@@ -6,6 +6,7 @@ const PAGES = [
   { id: 'missing',   label: 'Missing',   icon: '◌' },
   { id: 'dupes',     label: 'Duplicates', icon: '⊕' },
   { id: 'stats',     label: 'Stats',      icon: '◈' },
+  { id: 'tools',     label: 'Tools',      icon: '▣' },
 ]
 
 export default function NavBar({ page, setPage, owned, signOut, syncStatus, syncError, lastSyncedAt, syncDisabled }) {
