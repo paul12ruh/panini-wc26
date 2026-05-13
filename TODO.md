@@ -14,11 +14,13 @@ Owners:
 
 ## Open
 
+- [ ] [dev] Add Playwright smoke tests for main flows — cover dev auth, dashboard, album edit, missing list, tools CSV export, and mobile viewport
 - [ ] [future] Shared albums for collaborative collecting — use the planned album/member schema so multiple signed-in users can share one collection with roles, invites, and conflict-safe edits
 - [ ] [future] Native iPhone app for voice input — Web Speech API doesn't work on iOS Safari. Separate React Native / Expo project that reads/writes the same Supabase `collections` table via the user's session
 
 ## Done
 
+- [x] 2026-05-13 — Align dashboard side cards with Team Completion panel
 - [x] 2026-05-13 — Replace default Vite link metadata with Panini WC26 site metadata
 - [x] 2026-05-13 — Remove incorrect synthetic 00 sticker from album data
 - [x] 2026-05-13 — Add CSV export to the trade sheet tools
