@@ -71,6 +71,10 @@ Paul prefers the orchestrator stay hands-off on large implementations — delega
 - Never commit `.env` (gitignored)
 - Don't push without explicit ask
 
+## Task Tracking
+
+**`TODO.md` at repo root is the source of truth for open work.** Always read it at the start of a session, and update it whenever a task is added, started, or completed. Do not use the TaskCreate tool — it doesn't survive across sessions or tools (Codex can't see it). Mark items done by flipping `[ ]` to `[x]` and moving under the `## Done` section with a date.
+
 ## Branch Hygiene
 
 - Orchestrator's small fixes: directly on `main` is fine, push when asked

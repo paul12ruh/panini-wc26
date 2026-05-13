@@ -64,6 +64,10 @@ When asked to let agents test and improve the app, use a bounded QA mission rath
 - Ask each sub-agent to commit focused fixes and report changed files, remaining risks, and checks run.
 - The orchestrator reviews the commits, resolves integration issues, runs final checks, and pushes the branch for Vercel preview.
 
+## Task Tracking
+
+`TODO.md` at repo root is the canonical task list. Read it at the start of each session and update it whenever a task is added, started, or completed. Do not rely on in-tool task trackers — they do not persist across sessions or between Codex and Claude.
+
 ## Commit Principles
 
 - Commit after each coherent task or checkpoint, not only at the end.
