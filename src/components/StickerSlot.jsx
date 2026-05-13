@@ -28,12 +28,7 @@ function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetRarity }) {
   const handleClick = (e) => {
     e.stopPropagation()
     if (!owned) { onToggle(sticker.id); return }
-    openControls(e)
-  }
-
-  const handleUnmark = (e) => {
-    e.stopPropagation()
-    onToggle(sticker.id)
+    onToggle(sticker.id)  // owned → unmark immediately
   }
 
   useEffect(() => {
@@ -52,7 +47,7 @@ function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetRarity }) {
         title={`${sticker.id} — ${sticker.name}`}
       >
         {owned && <div className="sticker-check">✓</div>}
-        {owned && <button className="sticker-unmark" onClick={handleUnmark}>×</button>}
+        {owned && <button className="sticker-edit" onClick={openControls} title="Edit">⋯</button>}
         {isDup  && <div className="sticker-qty">×{entry.qty}</div>}
         <div className="sticker-id">{sticker.id}</div>
         <div className="sticker-icon">{TYPE_ICON[sticker.type] || '○'}</div>

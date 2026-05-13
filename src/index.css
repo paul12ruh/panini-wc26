@@ -531,15 +531,15 @@ body {
   color: #000;
   font-weight: 900;
 }
-.sticker-unmark {
+.sticker-edit {
   position: absolute;
-  top: 4px; right: 4px;
-  width: 18px; height: 18px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.15);
+  bottom: 4px; right: 4px;
+  width: 20px; height: 20px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.10);
   border: none;
   color: var(--text-2);
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
@@ -547,9 +547,8 @@ body {
   transition: opacity 0.15s, background 0.15s;
   z-index: 2;
 }
-.sticker-slot:hover .sticker-unmark,
-.sticker-slot.owned .sticker-unmark { opacity: 1; }
-.sticker-unmark:hover { background: rgba(255,80,80,0.5); color: #fff; }
+.sticker-slot:hover .sticker-edit { opacity: 1; }
+.sticker-edit:hover { background: rgba(255,255,255,0.2); color: var(--text); }
 
 /* controls popover */
 .sticker-controls {
