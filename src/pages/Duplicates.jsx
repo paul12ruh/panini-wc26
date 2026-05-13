@@ -1,6 +1,14 @@
 import { useMemo, useState } from 'react'
 import { SECTIONS, ALL_STICKERS } from '../data/stickers'
 
+const RARITY_COLORS = {
+  blue:   '#4da6ff',
+  red:    '#ff5c5c',
+  purple: '#b06efc',
+  green:  '#39ff89',
+  black:  '#e0e0e0',
+}
+
 export default function Duplicates({ collection }) {
   const [copied, setCopied] = useState(false)
 
@@ -74,8 +82,11 @@ export default function Duplicates({ collection }) {
                 className={`list-chip dup ${s.rarity !== 'base' ? `rarity-${s.rarity}` : ''}`}
               >
                 <span className="chip-id">{s.id}</span>
-                {s.rarity !== 'base' && (
-                  <span style={{ fontSize: 10 }}>{s.rarity === 'blue' ? '🔵' : '🟢'}</span>
+                {s.rarity && s.rarity !== 'base' && RARITY_COLORS[s.rarity] && (
+                  <span
+                    className="rarity-dot"
+                    style={{ background: RARITY_COLORS[s.rarity], width: 8, height: 8, flexShrink: 0 }}
+                  />
                 )}
                 <span className="chip-dup-badge">×{s.qty - 1}</span>
               </div>

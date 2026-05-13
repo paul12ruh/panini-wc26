@@ -5,17 +5,28 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
   const needed = TOTAL - owned
   const pct    = TOTAL ? ((owned / TOTAL) * 100).toFixed(1) : 0
 
+  const RARITY_COLORS = {
+    blue:   '#4da6ff',
+    red:    '#ff5c5c',
+    purple: '#b06efc',
+    green:  '#39ff89',
+    black:  '#e0e0e0',
+  }
+
   const rarityStats = useMemo(() => {
-    let blue = 0, green = 0, foilOwned = 0
+    const counts = { blue: 0, red: 0, purple: 0, green: 0, black: 0, foilOwned: 0 }
     Object.entries(collection).forEach(([id, e]) => {
       if (e.qty < 1) return
-      if (e.rarity === 'blue')  blue++
-      if (e.rarity === 'green') green++
+      if (e.rarity && e.rarity !== 'base' && counts[e.rarity] !== undefined) counts[e.rarity]++
       const sticker = ALL_STICKERS.find(s => s.id === id)
-      if (sticker?.type === 'foil') foilOwned++
+      if (sticker?.type === 'foil') counts.foilOwned++
     })
-    return { blue, green, foilOwned }
+    return counts
   }, [collection])
+
+  const totalParallels = Object.entries(rarityStats)
+    .filter(([k]) => k !== 'foilOwned')
+    .reduce((sum, [, v]) => sum + v, 0)
 
   // Album order — no sort, matches physical SECTIONS order
   const teamStats = useMemo(() => {
@@ -85,7 +96,7 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
         </div>
         <div className="stat-card glass stat-green">
           <div className="stat-card-icon">🌟</div>
-          <div className="stat-card-value">{rarityStats.blue + rarityStats.green}</div>
+          <div className="stat-card-value">{totalParallels}</div>
           <div className="stat-card-label">Rare parallels</div>
         </div>
       </div>
@@ -122,25 +133,19 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
           <div className="card glass">
             <div className="section-title">Rarity Breakdown</div>
             <div className="rarity-item">
-              <div className="rarity-dot base" />
-              <span className="rarity-label">Base stickers</span>
-              <span className="rarity-count">{owned - rarityStats.blue - rarityStats.green}</span>
-            </div>
-            <div className="rarity-item">
               <div className="rarity-dot foil" />
-              <span className="rarity-label">Foil stickers ✦</span>
+              <span className="rarity-label">Foil ✦</span>
               <span className="rarity-count" style={{ color: 'var(--gold)' }}>{rarityStats.foilOwned}</span>
             </div>
-            <div className="rarity-item">
-              <div className="rarity-dot blue" />
-              <span className="rarity-label">Blue frame 🔵</span>
-              <span className="rarity-count" style={{ color: 'var(--blue)' }}>{rarityStats.blue}</span>
-            </div>
-            <div className="rarity-item">
-              <div className="rarity-dot green" />
-              <span className="rarity-label">Green frame 🟢</span>
-              <span className="rarity-count" style={{ color: 'var(--green)' }}>{rarityStats.green}</span>
-            </div>
+            {Object.entries(RARITY_COLORS).map(([key, color]) =>
+              rarityStats[key] > 0 ? (
+                <div key={key} className="rarity-item">
+                  <div className="rarity-dot" style={{ background: color }} />
+                  <span className="rarity-label">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
+                  <span className="rarity-count" style={{ color }}>{rarityStats[key]}</span>
+                </div>
+              ) : null
+            )}
           </div>
 
           {/* Top teams */}

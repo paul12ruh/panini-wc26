@@ -69,19 +69,22 @@ export default function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetR
             {/* Frame / rarity */}
             <div>
               <div className="controls-title" style={{ marginBottom: 6 }}>Frame</div>
-              <div className="rarity-row">
+              <div className="rarity-swatches">
                 {[
-                  { key: 'base',  label: 'Base'  },
-                  { key: 'blue',  label: '🔵 Blue'  },
-                  { key: 'green', label: '🟢 Green' },
-                ].map(({ key, label }) => (
+                  { key: 'base',   color: '#555'    },
+                  { key: 'blue',   color: '#4da6ff' },
+                  { key: 'red',    color: '#ff5c5c' },
+                  { key: 'purple', color: '#b06efc' },
+                  { key: 'green',  color: '#39ff89' },
+                  { key: 'black',  color: '#1a1a1a', border: '#e0e0e0' },
+                ].map(({ key, color, border }) => (
                   <button
                     key={key}
-                    className={`rarity-btn ${rarity === key ? `active-${key}` : ''}`}
+                    className={`rarity-swatch ${rarity === key ? 'selected' : ''}`}
+                    style={{ background: color, border: border ? `2px solid ${border}` : '2px solid transparent' }}
                     onClick={() => onSetRarity(sticker.id, key)}
-                  >
-                    {label}
-                  </button>
+                    title={key.charAt(0).toUpperCase() + key.slice(1)}
+                  />
                 ))}
               </div>
             </div>
