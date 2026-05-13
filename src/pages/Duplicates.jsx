@@ -20,11 +20,21 @@ const writeClipboard = async (text) => {
 }
 
 const RARITY_COLORS = {
+  base:   '#8d96a3',
   blue:   '#4da6ff',
   red:    '#ff5c5c',
   purple: '#b06efc',
   green:  '#39ff89',
   black:  '#e0e0e0',
+}
+const RARITY_ORDER = ['base', 'blue', 'red', 'purple', 'green', 'black']
+
+const duplicateRarity = (variants = {}, fallback = 'base') => {
+  for (let i = RARITY_ORDER.length - 1; i >= 0; i -= 1) {
+    const rarity = RARITY_ORDER[i]
+    if ((variants[rarity] || 0) > 1) return rarity
+  }
+  return fallback || 'base'
 }
 
 const variantSummary = (variants = {}) => {
@@ -52,6 +62,7 @@ export default function Duplicates({ collection }) {
             ...st,
             qty: collection[st.id].qty,
             rarity: collection[st.id].rarity,
+            duplicateRarity: duplicateRarity(collection[st.id].variants, collection[st.id].rarity),
             variants: collection[st.id].variants,
           })),
       }))
@@ -114,14 +125,14 @@ export default function Duplicates({ collection }) {
             {g.dups.map(s => (
               <div
                 key={s.id}
-                className={`list-chip dup ${s.rarity !== 'base' ? `rarity-${s.rarity}` : ''}`}
+                className={`list-chip dup rarity-${s.duplicateRarity}`}
               >
                 <span className="chip-id">{s.id}</span>
                 {s.variants && <span className="chip-variant-summary">{variantSummary(s.variants)}</span>}
-                {s.rarity && s.rarity !== 'base' && RARITY_COLORS[s.rarity] && (
+                {s.duplicateRarity !== 'base' && RARITY_COLORS[s.duplicateRarity] && (
                   <span
                     className="rarity-dot"
-                    style={{ background: RARITY_COLORS[s.rarity], width: 8, height: 8, flexShrink: 0 }}
+                    style={{ background: RARITY_COLORS[s.duplicateRarity], width: 8, height: 8, flexShrink: 0 }}
                   />
                 )}
                 <span className="chip-dup-badge">×{s.qty - 1}</span>
