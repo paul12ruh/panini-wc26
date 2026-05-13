@@ -8,7 +8,7 @@ const PAGES = [
   { id: 'stats',     label: 'Stats',      icon: '◈' },
 ]
 
-export default function NavBar({ page, setPage, owned }) {
+export default function NavBar({ page, setPage, owned, signOut }) {
   const pct = Math.round((owned / TOTAL) * 100)
 
   return (
@@ -35,6 +35,7 @@ export default function NavBar({ page, setPage, owned }) {
         <strong>{pct}%</strong>
         <span>{owned}/{TOTAL}</span>
       </div>
+      <button className="nav-signout" onClick={signOut} title="Sign out">↪</button>
     </nav>
   )
 }

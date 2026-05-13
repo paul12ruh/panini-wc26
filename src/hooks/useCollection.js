@@ -82,8 +82,13 @@ export function useCollection() {
     reader.readAsText(file)
   }, [])
 
+  const loadCollection = useCallback((data) => {
+    save(data)
+    setCollection(data)
+  }, [])
+
   const owned = Object.values(collection).filter(v => v.qty > 0).length
   const duplicates = Object.values(collection).reduce((sum, v) => sum + Math.max(0, v.qty - 1), 0)
 
-  return { collection, get, toggle, setQty, setRarity, exportJSON, importJSON, owned, duplicates }
+  return { collection, get, toggle, setQty, setRarity, exportJSON, importJSON, owned, duplicates, loadCollection }
 }
