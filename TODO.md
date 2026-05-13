@@ -19,6 +19,7 @@ Owners:
 
 ## Done
 
+- [x] 2026-05-13 — Replace default Vite link metadata with Panini WC26 site metadata
 - [x] 2026-05-13 — Remove incorrect synthetic 00 sticker from album data
 - [x] 2026-05-13 — Add CSV export to the trade sheet tools
 - [x] 2026-05-13 — Simplify Missing tab rows to show only missing sticker IDs and names
