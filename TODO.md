@@ -19,6 +19,7 @@ Owners:
 
 ## Done
 
+- [x] 2026-05-13 — Clean up Tools page ordering and section demarcation
 - [x] 2026-05-13 — Add collection insights
 - [x] 2026-05-13 — Add recent activity and undo history
 - [x] 2026-05-13 — Add trade/share mode

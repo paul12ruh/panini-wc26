@@ -164,73 +164,104 @@ export default function Tools({ collection, setRarity, activity, undoLastActivit
         <div className="page-subtitle">Fast entry, pack review, trading, recent changes, and collection insights.</div>
       </div>
 
-      <div className="tools-grid">
-        <section className="tool-panel glass">
-          <div className="section-title">Mobile Quick Add</div>
-          <form className="tool-form" onSubmit={handleQuickAdd}>
-            <input
-              className="tool-input"
-              value={quickValue}
-              onChange={e => setQuickValue(e.target.value)}
-              placeholder="MEX-2, Mexico 2, or player name"
-              aria-label="Sticker to add"
-            />
-            <select className="tool-select" value={quickRarity} onChange={e => setQuickRarity(e.target.value)} aria-label="Color">
-              {RARITIES.map(rarity => <option key={rarity} value={rarity}>{rarity}</option>)}
-            </select>
-            <button className="btn btn-primary" type="submit">Add</button>
-          </form>
-          {quickMessage && <div className="tool-note">{quickMessage}</div>}
-        </section>
-
-        <section className="tool-panel glass">
-          <div className="section-title">Pack Opening</div>
-          <textarea
-            className="tool-textarea"
-            value={packText}
-            onChange={e => setPackText(e.target.value)}
-            placeholder="Enter one sticker per line or comma-separated: MEX-2, France 7, Messi"
-            aria-label="Pack stickers"
-          />
-          <div className="tool-actions">
-            <select className="tool-select" value={packRarity} onChange={e => setPackRarity(e.target.value)} aria-label="Pack color">
-              {RARITIES.map(rarity => <option key={rarity} value={rarity}>{rarity}</option>)}
-            </select>
-            <button className="btn btn-primary" onClick={handleCommitPack}>Commit Pack</button>
+      <div className="tools-stack">
+        <section className="tool-section">
+          <div className="tool-section-heading">
+            <span>1</span>
+            <div>
+              <h2>Capture Stickers</h2>
+              <p>Add one sticker quickly, or commit a full pack in one pass.</p>
+            </div>
           </div>
-          {packMessage && <div className="tool-note">{packMessage}</div>}
-        </section>
+          <div className="tools-grid tools-grid-capture">
+            <section className="tool-panel glass">
+              <div className="section-title">Quick Add</div>
+              <form className="tool-form" onSubmit={handleQuickAdd}>
+                <input
+                  className="tool-input"
+                  value={quickValue}
+                  onChange={e => setQuickValue(e.target.value)}
+                  placeholder="MEX-2, Mexico 2, or player name"
+                  aria-label="Sticker to add"
+                />
+                <select className="tool-select" value={quickRarity} onChange={e => setQuickRarity(e.target.value)} aria-label="Color">
+                  {RARITIES.map(rarity => <option key={rarity} value={rarity}>{rarity}</option>)}
+                </select>
+                <button className="btn btn-primary" type="submit">Add</button>
+              </form>
+              {quickMessage && <div className="tool-note">{quickMessage}</div>}
+            </section>
 
-        <section className="tool-panel glass">
-          <div className="section-title">Trade / Share</div>
-          <textarea className="tool-textarea trade-textarea" value={tradeText} readOnly aria-label="Trade sheet" />
-          <button className="btn btn-primary" onClick={handleCopyTrade}>{copied ? 'Copied' : 'Copy trade sheet'}</button>
-        </section>
-
-        <section className="tool-panel glass">
-          <div className="section-title">Recent Activity</div>
-          <button className="btn btn-ghost" onClick={undoLastActivity} disabled={!activity.length}>Undo last change</button>
-          <div className="activity-list">
-            {activity.slice(0, 8).map(item => (
-              <div key={item.id} className="activity-row">
-                <span className="activity-id">{item.stickerId}</span>
-                <span>{item.action}</span>
+            <section className="tool-panel glass">
+              <div className="section-title">Pack Opening</div>
+              <textarea
+                className="tool-textarea"
+                value={packText}
+                onChange={e => setPackText(e.target.value)}
+                placeholder="Enter one sticker per line or comma-separated: MEX-2, France 7, Messi"
+                aria-label="Pack stickers"
+              />
+              <div className="tool-actions">
+                <select className="tool-select" value={packRarity} onChange={e => setPackRarity(e.target.value)} aria-label="Pack color">
+                  {RARITIES.map(rarity => <option key={rarity} value={rarity}>{rarity}</option>)}
+                </select>
+                <button className="btn btn-primary" onClick={handleCommitPack}>Commit Pack</button>
               </div>
-            ))}
-            {!activity.length && <div className="panel-empty">No recent changes yet.</div>}
+              {packMessage && <div className="tool-note">{packMessage}</div>}
+            </section>
           </div>
         </section>
 
-        <section className="tool-panel glass tool-panel-wide">
-          <div className="section-title">Collection Insights</div>
-          <div className="insight-grid">
-            <div className="insight-card"><span>Completion</span><strong>{insights.pct}%</strong></div>
-            <div className="insight-card"><span>Duplicates</span><strong>{duplicates}</strong></div>
-            <div className="insight-card"><span>Closest section</span><strong>{insights.closest ? `${insights.closest.name} ${insights.closest.pct}%` : 'Complete'}</strong></div>
-            <div className="insight-card"><span>Needs focus</span><strong>{insights.weakest ? `${insights.weakest.name} ${insights.weakest.pct}%` : 'Complete'}</strong></div>
-            <div className="insight-card"><span>Top duplicate</span><strong>{insights.topDuplicate ? `${insights.topDuplicate.id} +${insights.topDuplicate.extra}` : 'None'}</strong></div>
-            <div className="insight-card"><span>Variants</span><strong>{RARITIES.map(rarity => `${rarity[0].toUpperCase()}:${insights.variantTotals[rarity]}`).join(' ')}</strong></div>
+        <section className="tool-section">
+          <div className="tool-section-heading">
+            <span>2</span>
+            <div>
+              <h2>Review Collection</h2>
+              <p>Check progress, duplicate pressure, variants, and recent edits.</p>
+            </div>
           </div>
+          <div className="tools-grid tools-grid-review">
+            <section className="tool-panel glass">
+              <div className="section-title">Collection Insights</div>
+              <div className="insight-grid">
+                <div className="insight-card"><span>Completion</span><strong>{insights.pct}%</strong></div>
+                <div className="insight-card"><span>Duplicates</span><strong>{duplicates}</strong></div>
+                <div className="insight-card"><span>Closest section</span><strong>{insights.closest ? `${insights.closest.name} ${insights.closest.pct}%` : 'Complete'}</strong></div>
+                <div className="insight-card"><span>Needs focus</span><strong>{insights.weakest ? `${insights.weakest.name} ${insights.weakest.pct}%` : 'Complete'}</strong></div>
+                <div className="insight-card"><span>Top duplicate</span><strong>{insights.topDuplicate ? `${insights.topDuplicate.id} +${insights.topDuplicate.extra}` : 'None'}</strong></div>
+                <div className="insight-card"><span>Variants</span><strong>{RARITIES.map(rarity => `${rarity[0].toUpperCase()}:${insights.variantTotals[rarity]}`).join(' ')}</strong></div>
+              </div>
+            </section>
+
+            <section className="tool-panel glass">
+              <div className="section-title">Recent Activity</div>
+              <button className="btn btn-ghost" onClick={undoLastActivity} disabled={!activity.length}>Undo last change</button>
+              <div className="activity-list">
+                {activity.slice(0, 8).map(item => (
+                  <div key={item.id} className="activity-row">
+                    <span className="activity-id">{item.stickerId}</span>
+                    <span>{item.action}</span>
+                  </div>
+                ))}
+                {!activity.length && <div className="panel-empty">No recent changes yet.</div>}
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section className="tool-section">
+          <div className="tool-section-heading">
+            <span>3</span>
+            <div>
+              <h2>Share For Trading</h2>
+              <p>Copy a clean missing and duplicate list for other collectors.</p>
+            </div>
+          </div>
+          <section className="tool-panel glass">
+            <div className="section-title">Trade Sheet</div>
+            <textarea className="tool-textarea trade-textarea" value={tradeText} readOnly aria-label="Trade sheet" />
+            <button className="btn btn-primary" onClick={handleCopyTrade}>{copied ? 'Copied' : 'Copy trade sheet'}</button>
+          </section>
         </section>
       </div>
     </div>
