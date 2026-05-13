@@ -11,7 +11,34 @@ Vite + React app for tracking a Panini FIFA World Cup 2026 sticker album.
 - Data: `src/data/stickers.js` — SECTIONS (teams + intros), TEAMS, GROUPS, CONFEDERATIONS, TOTAL
 - Collection state: `src/hooks/useCollection.js` — persists to `localStorage` under `panini-wc2026`
 - Auth + cloud sync: `src/hooks/useAuth.js`, `src/hooks/useSync.js`, `src/lib/supabase.js` — Supabase via `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
-- Deploy: Vercel, auto-deploys on push to `main`
+- Deploy: Vercel, auto-deploys on push to `main` (see Infrastructure below)
+
+## Infrastructure
+
+| Thing | Value |
+|---|---|
+| Production URL | https://panini-wc26-one.vercel.app |
+| GitHub repo | https://github.com/paul12ruh/panini-wc26 |
+| Hosting | Vercel — auto-deploys on push to `main`, branches get preview URLs |
+| Backend | Supabase project ref `wjnttgjbcttabpjzamoh` |
+| Supabase URL | https://wjnttgjbcttabpjzamoh.supabase.co |
+| Auth providers enabled | Google OAuth + Email magic link |
+| Database table | `collections` (user_id uuid PK → auth.users, data jsonb, updated_at timestamptz) with Row Level Security: `auth.uid() = user_id` |
+
+**Env vars** — must be set identically in `.env` (local) and Vercel → Project Settings → Environment Variables:
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY` (publishable key in `sb_publishable_...` format — safe for client; RLS protects data)
+
+To verify Vercel env vars without dashboard access:
+```bash
+curl -s https://panini-wc26-one.vercel.app/ | grep -oE 'assets/[^"]+\.js' | head -1
+# then curl that JS bundle and grep for the supabase URL/key — they're inlined by Vite
+```
+
+To verify Supabase auth providers without dashboard access:
+```bash
+curl -s "https://wjnttgjbcttabpjzamoh.supabase.co/auth/v1/settings" -H "apikey: <anon key>" | python3 -m json.tool
+```
 
 ## Common Commands
 

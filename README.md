@@ -102,6 +102,22 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 - `npm run lint` runs ESLint.
 - `npm run preview` serves the production build locally.
 
+## Deployment
+
+The app is deployed on Vercel at https://panini-wc26-one.vercel.app — auto-deploys on push to `main`, feature branches get preview URLs. Source repo: https://github.com/paul12ruh/panini-wc26.
+
+The backend is a Supabase project (ref `wjnttgjbcttabpjzamoh`) with Google OAuth + email magic link enabled and a `collections` table (RLS scoped to `auth.uid()`).
+
+`VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` must be set in both `.env` (local) and Vercel → Project Settings → Environment Variables.
+
+Recommended workflow:
+
+- Keep production deployments tied to the production branch, normally `main`.
+- Do changes on feature, fix, or experiment branches.
+- Push branches to Vercel preview deployments and test the preview URL before merging.
+- Merge to the production branch only after the branch is reviewed and checks have run.
+- Use separate preview/production Supabase configuration if a change could affect real collection data.
+
 ## Data persistence
 
 Collection data is stored locally in the browser and synced to Supabase after sign-in.
