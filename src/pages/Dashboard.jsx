@@ -1,32 +1,11 @@
-import { useMemo } from 'react'
-import { SECTIONS, TOTAL, ALL_STICKERS, CONFEDERATIONS } from '../data/stickers'
+import { useMemo, useState } from 'react'
+import { SECTIONS, TOTAL } from '../data/stickers'
 
 export default function Dashboard({ collection, owned, duplicates, setPage, setFocusSection }) {
   const needed = TOTAL - owned
   const pct    = TOTAL ? ((owned / TOTAL) * 100).toFixed(1) : 0
 
-  const RARITY_COLORS = {
-    blue:   '#4da6ff',
-    red:    '#ff5c5c',
-    purple: '#b06efc',
-    green:  '#39ff89',
-    black:  '#e0e0e0',
-  }
-
-  const rarityStats = useMemo(() => {
-    const counts = { blue: 0, red: 0, purple: 0, green: 0, black: 0, foilOwned: 0 }
-    Object.entries(collection).forEach(([id, e]) => {
-      if (e.qty < 1) return
-      if (e.rarity && e.rarity !== 'base' && counts[e.rarity] !== undefined) counts[e.rarity]++
-      const sticker = ALL_STICKERS.find(s => s.id === id)
-      if (sticker?.type === 'foil') counts.foilOwned++
-    })
-    return counts
-  }, [collection])
-
-  const totalParallels = Object.entries(rarityStats)
-    .filter(([k]) => k !== 'foilOwned')
-    .reduce((sum, [, v]) => sum + v, 0)
+  const totalParallels = Object.values(collection).filter(e => e.qty > 0 && e.rarity && e.rarity !== 'base').length
 
   // Album order — no sort, matches physical SECTIONS order
   const teamStats = useMemo(() => {
@@ -37,6 +16,14 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
         return { ...s, ownedCount, pct: Math.round((ownedCount / s.stickers.length) * 100) }
       })
   }, [collection])
+
+  const [heatmapSort, setHeatmapSort] = useState('group')
+
+  const sortedTeamStats = useMemo(() => {
+    if (heatmapSort === 'alpha') return [...teamStats].sort((a, b) => a.name.localeCompare(b.name))
+    if (heatmapSort === 'pct')   return [...teamStats].sort((a, b) => b.pct - a.pct || a.name.localeCompare(b.name))
+    return teamStats // 'group': natural SECTIONS order
+  }, [teamStats, heatmapSort])
 
   // Side-panel rankings remain sorted by completion %
   const topTeams    = [...teamStats].sort((a, b) => b.pct - a.pct).slice(0, 5)
@@ -107,8 +94,13 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
         <div>
           <div className="section-title">Team Completion</div>
           <div className="card glass">
+            <div className="sort-chips" style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
+              {[['group','Group'],['alpha','A–Z'],['pct','% Done']].map(([key,label]) => (
+                <button key={key} className={`chip ${heatmapSort===key?'active':''}`} onClick={() => setHeatmapSort(key)}>{label}</button>
+              ))}
+            </div>
             <div className="team-comp-grid">
-              {teamStats.map(ts => (
+              {sortedTeamStats.map(ts => (
                 <div
                   key={ts.id}
                   className={`team-tile glass ${ts.pct === 100 ? 'complete' : ''}`}
