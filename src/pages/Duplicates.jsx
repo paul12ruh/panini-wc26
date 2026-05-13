@@ -27,6 +27,13 @@ const RARITY_COLORS = {
   black:  '#e0e0e0',
 }
 
+const variantSummary = (variants = {}) => {
+  return Object.entries(variants)
+    .filter(([, qty]) => qty > 0)
+    .map(([rarity, qty]) => `${rarity[0].toUpperCase()}${rarity.slice(1)} ${qty}`)
+    .join(' · ')
+}
+
 export default function Duplicates({ collection }) {
   const [copied, setCopied] = useState(false)
   const [copyError, setCopyError] = useState('')
@@ -41,7 +48,12 @@ export default function Duplicates({ collection }) {
         ...s,
         dups: s.stickers
           .filter(st => dupIds.includes(st.id))
-          .map(st => ({ ...st, qty: collection[st.id].qty, rarity: collection[st.id].rarity })),
+          .map(st => ({
+            ...st,
+            qty: collection[st.id].qty,
+            rarity: collection[st.id].rarity,
+            variants: collection[st.id].variants,
+          })),
       }))
       .filter(s => s.dups.length > 0)
   }, [collection])
@@ -105,6 +117,7 @@ export default function Duplicates({ collection }) {
                 className={`list-chip dup ${s.rarity !== 'base' ? `rarity-${s.rarity}` : ''}`}
               >
                 <span className="chip-id">{s.id}</span>
+                {s.variants && <span className="chip-variant-summary">{variantSummary(s.variants)}</span>}
                 {s.rarity && s.rarity !== 'base' && RARITY_COLORS[s.rarity] && (
                   <span
                     className="rarity-dot"

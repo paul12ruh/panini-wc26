@@ -10,7 +10,9 @@ const RARITIES = [
   { key: 'black',  label: 'Black',  color: '#1a1a1a', border: '#e0e0e0' },
 ]
 
-function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetRarity }) {
+const EMPTY_VARIANTS = { base: 0, blue: 0, red: 0, purple: 0, green: 0, black: 0 }
+
+function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetRarity, onSetVariantQty }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
   const closeRef = useRef(null)
@@ -19,6 +21,7 @@ function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetRarity }) {
   const rarity   = entry.rarity || 'base'
   const isDup    = entry.qty > 1
   const rarityClass = owned && rarity !== 'base' ? `rarity-${rarity}` : ''
+  const variants = { ...EMPTY_VARIANTS, ...(entry.variants || {}) }
 
   const closeControls = () => {
     setOpen(false)
@@ -96,20 +99,37 @@ function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetRarity }) {
             </div>
 
             <div>
-              <div className="controls-title" style={{ marginBottom: 8 }}>Rarity</div>
-              <div className="rarity-grid">
+              <div className="controls-title" style={{ marginBottom: 8 }}>Color inventory</div>
+              <div className="rarity-grid variant-grid">
                 {RARITIES.map(({ key, label, color, border }) => (
-                  <button
+                  <div
                     key={key}
                     className={`rarity-tile ${rarity === key ? 'selected' : ''}`}
-                    onClick={() => onSetRarity(sticker.id, key)}
                   >
                     <span
                       className="rarity-tile-dot"
                       style={{ background: color, border: border ? `2px solid ${border}` : '2px solid transparent' }}
                     />
                     <span className="rarity-tile-label">{label}</span>
-                  </button>
+                    <span className="variant-count">{variants[key] || 0}</span>
+                    <span className="variant-stepper">
+                      <button
+                        className="variant-step-btn"
+                        onClick={() => onSetVariantQty(sticker.id, key, (variants[key] || 0) - 1)}
+                        disabled={(variants[key] || 0) <= 0}
+                        aria-label={`Decrease ${label} ${sticker.id} quantity`}
+                      >
+                        −
+                      </button>
+                      <button
+                        className="variant-step-btn"
+                        onClick={() => onSetRarity(sticker.id, key)}
+                        aria-label={`Add ${label} ${sticker.id}`}
+                      >
+                        +
+                      </button>
+                    </span>
+                  </div>
                 ))}
               </div>
             </div>

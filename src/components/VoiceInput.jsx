@@ -317,19 +317,21 @@ export default function VoiceInput({ collection, onMark, onSetRarity }) {
       }
 
       const isOwned = collection[stickerId]?.qty > 0
-      const currentRarity = collection[stickerId]?.rarity || 'base'
       const rarityLabel = RARITY_LABELS[rarity]
 
       if (isOwned) {
-        if (rarity !== currentRarity && onSetRarity) {
+        if (onSetRarity) {
           onSetRarity(stickerId, rarity)
-          showToast(`Updated ${stickerId} to ${rarityLabel}`)
+          showToast(`Added ${rarityLabel} ${stickerId}`)
         } else {
           showToast(`${stickerId} already marked`)
         }
       } else {
-        onMark(stickerId)
-        if (rarity !== 'base' && onSetRarity) onSetRarity(stickerId, rarity)
+        if (rarity === 'base' || !onSetRarity) {
+          onMark(stickerId)
+        } else {
+          onSetRarity(stickerId, rarity)
+        }
         const rarityText = rarity === 'base' ? '' : ` ${rarityLabel}`
         showToast(`Marked${rarityText} ${stickerId} — ${sticker.name} ✓`, stickerId)
       }

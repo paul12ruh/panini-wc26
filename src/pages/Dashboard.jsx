@@ -5,7 +5,13 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
   const needed = TOTAL - owned
   const pct    = TOTAL ? ((owned / TOTAL) * 100).toFixed(1) : 0
 
-  const totalParallels = Object.values(collection).filter(e => e.qty > 0 && e.rarity && e.rarity !== 'base').length
+  const totalParallels = Object.values(collection).reduce((sum, e) => {
+    if (e.qty < 1) return sum
+    if (e.variants) {
+      return sum + ['blue', 'red', 'purple', 'green', 'black'].reduce((n, rarity) => n + (e.variants[rarity] || 0), 0)
+    }
+    return sum + (e.rarity && e.rarity !== 'base' ? 1 : 0)
+  }, 0)
 
   const allStats = useMemo(() => {
     return SECTIONS.map(s => {

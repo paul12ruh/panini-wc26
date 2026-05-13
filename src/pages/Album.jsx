@@ -2,10 +2,14 @@ import { useState, useMemo, useEffect } from 'react'
 import { SECTIONS, GROUPS } from '../data/stickers'
 import StickerSlot from '../components/StickerSlot'
 
-const DEFAULT_ENTRY = { qty: 0, rarity: 'base' }
+const DEFAULT_ENTRY = {
+  qty: 0,
+  rarity: 'base',
+  variants: { base: 0, blue: 0, red: 0, purple: 0, green: 0, black: 0 },
+}
 const FILTERS = ['All', 'Intro', ...GROUPS.map(group => `Group ${group}`)]
 
-export default function Album({ collection, toggle, setQty, setRarity, focusSection, setFocusSection, setPage }) {
+export default function Album({ collection, toggle, setQty, setRarity, setVariantQty, focusSection, setFocusSection, setPage }) {
   const [search,      setSearch]      = useState('')
   const [filter,      setFilter]      = useState('All')
   const [expanded,    setExpanded]    = useState({})
@@ -161,6 +165,7 @@ export default function Album({ collection, toggle, setQty, setRarity, focusSect
                       onToggle={toggle}
                       onSetQty={setQty}
                       onSetRarity={setRarity}
+                      onSetVariantQty={setVariantQty}
                     />
                   ))}
                 </div>

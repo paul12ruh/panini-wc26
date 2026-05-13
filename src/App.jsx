@@ -17,7 +17,7 @@ export default function App() {
   const [heatmapSort, setHeatmapSort] = useState('group')
   const {
     collection, get, toggle,
-    setQty, setRarity,
+    setQty, setRarity, setVariantQty,
     owned, duplicates, loadCollection, lastUpdatedAt,
   } = useCollection()
 
@@ -28,7 +28,7 @@ export default function App() {
   if (authLoading) return <div className="auth-loading">Loading…</div>
   if (!session)    return <AuthGate signIn={signIn} signInWithGoogle={signInWithGoogle} />
 
-  const sharedProps = { collection, get, toggle, setQty, setRarity }
+  const sharedProps = { collection, get, toggle, setQty, setRarity, setVariantQty }
 
   return (
     <>

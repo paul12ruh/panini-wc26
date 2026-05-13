@@ -14,7 +14,13 @@ export default function Stats({ collection }) {
     const counts = { blue: 0, red: 0, purple: 0, green: 0, black: 0, foilOwned: 0 }
     Object.entries(collection).forEach(([id, e]) => {
       if (e.qty < 1) return
-      if (e.rarity && e.rarity !== 'base' && counts[e.rarity] !== undefined) counts[e.rarity]++
+      if (e.variants) {
+        Object.keys(RARITY_COLORS).forEach(rarity => {
+          counts[rarity] += e.variants[rarity] || 0
+        })
+      } else if (e.rarity && e.rarity !== 'base' && counts[e.rarity] !== undefined) {
+        counts[e.rarity]++
+      }
       const sticker = ALL_STICKERS.find(s => s.id === id)
       if (sticker?.type === 'foil') counts.foilOwned++
     })

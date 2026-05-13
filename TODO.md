@@ -14,7 +14,6 @@ Owners:
 
 ## Open
 
-- [ ] [dev] Track per-sticker color variants — migrate from single `rarity` to variant inventory so each sticker records total quantity plus base/blue/red/purple/green/black quantities; default new clicks to base, show/save the highest owned color for display, and keep duplicate counts based on total quantity only
 - [ ] [dev] Add mobile quick-add mode — create a phone-first flow for rapidly entering team/number stickers without relying on browser voice support
 - [ ] [dev] Add pack-opening session mode — let the user enter a batch of new stickers, review duplicates/new hits, then commit the pack
 - [ ] [dev] Add trade/share mode — generate a clean shareable missing/duplicates view for trading with other collectors
@@ -24,6 +23,7 @@ Owners:
 
 ## Done
 
+- [x] 2026-05-13 — Track per-sticker color variants while keeping duplicate counts based on total quantity
 - [x] 2026-05-13 — Review phone web UX and document current mobile behavior
 - [x] 2026-05-13 — Add cool feature ideas backlog
 - [x] 2026-05-13 — Verify and clarify cross-device autosave/backup behavior
