@@ -19,6 +19,7 @@ Owners:
 
 ## Done
 
+- [x] 2026-05-13 — Remove incorrect synthetic 00 sticker from album data
 - [x] 2026-05-13 — Add CSV export to the trade sheet tools
 - [x] 2026-05-13 — Simplify Missing tab rows to show only missing sticker IDs and names
 - [x] 2026-05-13 — Clean up Tools page ordering and section demarcation
@@ -35,7 +36,7 @@ Owners:
 - [x] 2026-05-13 — Add voice input instructions and color parsing
 - [x] 2026-05-13 — Change Album filters from confederations to groups
 - [x] 2026-05-13 — Add confederation view to Stats
-- [x] 2026-05-13 — Add normal sticker 00 before FWC-1
+- [x] 2026-05-13 — Investigate suspected 00 sticker before confirming it was the We Are Panini sticker
 - [x] 2026-05-13 — Improve sync error visibility and conflict handling
 - [x] 2026-05-13 — Harden collection data validation for local cache, imports, and cloud payloads
 - [x] 2026-05-13 — Tighten voice input parsing to avoid short team alias substring matches

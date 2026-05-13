@@ -138,7 +138,6 @@ export const SECTIONS = [
     name: 'FIFA World Cup 2026',
     type: 'intro',
     stickers: [
-      { id: '00',     num: 0,  name: 'Sticker 00',                 type: 'base' },
       { id: 'FWC-1',  num: 1,  name: 'Official Emblem',             type: 'foil' },
       { id: 'FWC-2',  num: 2,  name: 'Mascot — Kazú',               type: 'foil' },
       { id: 'FWC-3',  num: 3,  name: 'Official Ball',               type: 'foil' },
