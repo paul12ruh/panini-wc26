@@ -4,7 +4,7 @@ import StickerSlot from '../components/StickerSlot'
 
 const DEFAULT_ENTRY = { qty: 0, rarity: 'base' }
 
-export default function Album({ collection, get, toggle, setQty, setRarity, focusSection, setFocusSection, setPage }) {
+export default function Album({ collection, toggle, setQty, setRarity, focusSection, setFocusSection, setPage }) {
   const [search,      setSearch]      = useState('')
   const [filter,      setFilter]      = useState('All')
   const [expanded,    setExpanded]    = useState({})
@@ -37,6 +37,12 @@ export default function Album({ collection, get, toggle, setQty, setRarity, focu
       setExpanded(all)
     }
     setAllExpanded(p => !p)
+  }
+
+  const handleSectionKeyDown = (e, id) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return
+    e.preventDefault()
+    toggle_section(id)
   }
 
   const filtered = useMemo(() => {
@@ -102,6 +108,11 @@ export default function Album({ collection, get, toggle, setQty, setRarity, focu
               <div
                 className="team-section-header"
                 onClick={() => toggle_section(section.id)}
+                onKeyDown={e => handleSectionKeyDown(e, section.id)}
+                role="button"
+                tabIndex={0}
+                aria-expanded={Boolean(isOpen)}
+                aria-controls={`stickers-${section.id}`}
               >
                 <div className="ts-flag">{section.flag || (section.type === 'intro' ? '🏆' : '')}</div>
                 <div className="ts-info">
@@ -120,7 +131,7 @@ export default function Album({ collection, get, toggle, setQty, setRarity, focu
               </div>
 
               {isOpen && (
-                <div className="sticker-grid">
+                <div className="sticker-grid" id={`stickers-${section.id}`}>
                   {section.stickers.map(sticker => (
                     <StickerSlot
                       key={sticker.id}

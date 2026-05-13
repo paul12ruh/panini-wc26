@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { SECTIONS, ALL_STICKERS } from '../data/stickers'
+import { SECTIONS } from '../data/stickers'
 
 const RARITY_COLORS = {
   blue:   '#4da6ff',
@@ -11,6 +11,7 @@ const RARITY_COLORS = {
 
 export default function Duplicates({ collection }) {
   const [copied, setCopied] = useState(false)
+  const [copyError, setCopyError] = useState('')
 
   const groups = useMemo(() => {
     const dupIds = Object.entries(collection)
@@ -39,10 +40,13 @@ export default function Duplicates({ collection }) {
       return `${g.name}: ${ids.join(', ')}`
     })
     const text = `Trade list (${totalDups} duplicates)\n\n${lines.join('\n')}`
-    navigator.clipboard.writeText(text).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
+    setCopyError('')
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+      })
+      .catch(() => setCopyError('Copy failed. Your browser may require HTTPS or clipboard permission.'))
   }
 
   if (groups.length === 0) return (
@@ -50,7 +54,7 @@ export default function Duplicates({ collection }) {
       <div className="empty">
         <div className="empty-icon">📦</div>
         <div className="empty-title">No duplicates yet</div>
-        <div className="empty-sub">When you have more than one of a sticker, they'll appear here.</div>
+        <div className="empty-sub">When you have more than one of a sticker, they&apos;ll appear here.</div>
       </div>
     </div>
   )
@@ -67,6 +71,7 @@ export default function Duplicates({ collection }) {
           {copied ? '✓ Copied!' : '📋 Copy trade list'}
         </button>
       </div>
+      {copyError && <div className="inline-error">{copyError}</div>}
 
       {groups.map(g => (
         <div key={g.id} className="group-card glass">

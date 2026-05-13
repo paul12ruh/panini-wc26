@@ -26,6 +26,16 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
   // Side-panel rankings remain sorted by completion %
   const topTeams    = [...teamStats].sort((a, b) => b.pct - a.pct).slice(0, 5)
   const bottomTeams = [...teamStats].sort((a, b) => a.pct - b.pct).slice(0, 3)
+  const openSection = (id) => {
+    setFocusSection(id)
+    setPage('album')
+  }
+
+  const handleNavKeyDown = (e, id) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return
+    e.preventDefault()
+    openSection(id)
+  }
 
   return (
     <div className="page">
@@ -89,7 +99,10 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
                 <div
                   key={ts.id}
                   className={`team-tile glass ${ts.pct === 100 ? 'complete' : ''}`}
-                  onClick={() => { setFocusSection(ts.id); setPage('album') }}
+                  onClick={() => openSection(ts.id)}
+                  onKeyDown={e => handleNavKeyDown(e, ts.id)}
+                  role="button"
+                  tabIndex={0}
                   title={`${ts.name}: ${ts.ownedCount}/${ts.stickers.length}`}
                 >
                   <div className="team-tile-flag">{ts.flag || '🏆'}</div>
@@ -135,7 +148,14 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
           <div className="card glass">
             <div className="section-title">Most Complete</div>
             {topTeams.map((ts, i) => (
-              <div key={ts.id} className="top-team-row" onClick={() => { setFocusSection(ts.id); setPage('album') }}>
+              <div
+                key={ts.id}
+                className="top-team-row"
+                onClick={() => openSection(ts.id)}
+                onKeyDown={e => handleNavKeyDown(e, ts.id)}
+                role="button"
+                tabIndex={0}
+              >
                 <span className="top-team-rank">#{i + 1}</span>
                 <span className="top-team-flag">{ts.flag}</span>
                 <span className="top-team-name">{ts.name}</span>
@@ -148,8 +168,19 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
           {bottomTeams.some(t => t.pct < 100) && (
             <div className="card glass">
               <div className="section-title">Needs Attention</div>
-              {bottomTeams.filter(t => t.pct < 100).map((ts, i) => (
-                <div key={ts.id} className="top-team-row" onClick={() => setPage('missing')}>
+              {bottomTeams.filter(t => t.pct < 100).map((ts) => (
+                <div
+                  key={ts.id}
+                  className="top-team-row"
+                  onClick={() => setPage('missing')}
+                  onKeyDown={e => {
+                    if (e.key !== 'Enter' && e.key !== ' ') return
+                    e.preventDefault()
+                    setPage('missing')
+                  }}
+                  role="button"
+                  tabIndex={0}
+                >
                   <span className="top-team-rank">{ts.stickers.length - ts.ownedCount}</span>
                   <span className="top-team-flag">{ts.flag}</span>
                   <span className="top-team-name">{ts.name}</span>

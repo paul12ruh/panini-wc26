@@ -3,6 +3,7 @@ import { SECTIONS } from '../data/stickers'
 
 export default function Missing({ collection }) {
   const [copied, setCopied] = useState(false)
+  const [copyError, setCopyError] = useState('')
 
   const groups = useMemo(() => {
     return SECTIONS
@@ -20,10 +21,13 @@ export default function Missing({ collection }) {
       `${g.name}:\n  ${g.missing.map(s => s.id).join(', ')}`
     )
     const text = `Missing stickers (${total} total)\n\n${lines.join('\n\n')}`
-    navigator.clipboard.writeText(text).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
+    setCopyError('')
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+      })
+      .catch(() => setCopyError('Copy failed. Your browser may require HTTPS or clipboard permission.'))
   }
 
   const exportTxt = () => {
@@ -65,6 +69,7 @@ export default function Missing({ collection }) {
           ⬇ Export .txt
         </button>
       </div>
+      {copyError && <div className="inline-error">{copyError}</div>}
 
       {groups.map(g => (
         <div key={g.id} className="group-card glass">

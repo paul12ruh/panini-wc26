@@ -262,6 +262,15 @@ body {
   border-color: var(--border-2);
   box-shadow: 0 8px 24px rgba(0,0,0,0.3);
 }
+.team-tile:focus-visible,
+.top-team-row:focus-visible,
+.team-section-header:focus-visible,
+.sticker-slot:focus-visible,
+.sticker-edit:focus-visible,
+.nav-signout:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
 .team-tile-flag { font-size: 22px; margin-bottom: 6px; }
 .team-tile-name {
   font-size: 10px;
@@ -547,6 +556,7 @@ body {
   z-index: 2;
 }
 .sticker-slot:hover .sticker-edit { opacity: 1; }
+.sticker-slot:focus-within .sticker-edit { opacity: 1; }
 .sticker-edit:hover { background: rgba(255,255,255,0.2); color: var(--text); }
 
 /* controls popover */
@@ -680,6 +690,11 @@ body {
   gap: 10px;
   margin-bottom: 20px;
   flex-wrap: wrap;
+}
+.inline-error {
+  margin: -8px 0 16px;
+  color: #ff6b6b;
+  font-size: 13px;
 }
 .btn {
   display: inline-flex;
@@ -963,7 +978,8 @@ body {
 
   /* Nav links span full width as a row of tabs */
   .navbar-links {
-    width: 100%;
+    flex: 1;
+    min-width: 0;
     justify-content: space-around;
   }
 
@@ -973,6 +989,7 @@ body {
     gap: 2px;
     padding: 6px 10px;
     font-size: 10px;
+    min-width: 0;
     min-height: 44px;
     flex: 1;
     justify-content: center;
@@ -992,7 +1009,7 @@ body {
 
   /* 4. Touch targets — minimum 44px height */
   .sticker-slot {
-    min-height: 44px;
+    min-height: 76px;
   }
   .qty-btn {
     min-height: 44px;
@@ -1009,6 +1026,18 @@ body {
   .rarity-swatch {
     width: 30px;
     height: 30px;
+  }
+  .sticker-edit {
+    opacity: 1;
+  }
+  .nav-signout {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+  }
+  .voice-toast {
+    width: calc(100vw - 28px);
+    white-space: normal;
   }
 
   /* Misc tweaks */
