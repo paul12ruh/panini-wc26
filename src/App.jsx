@@ -4,6 +4,7 @@ import Dashboard  from './pages/Dashboard'
 import Album      from './pages/Album'
 import Missing    from './pages/Missing'
 import Duplicates from './pages/Duplicates'
+import Stats      from './pages/Stats'
 import VoiceInput from './components/VoiceInput'
 import { useCollection } from './hooks/useCollection'
 
@@ -41,6 +42,7 @@ export default function App() {
       )}
       {page === 'missing' && <Missing   collection={collection} />}
       {page === 'dupes'   && <Duplicates collection={collection} />}
+      {page === 'stats'   && <Stats collection={collection} />}
 
       <VoiceInput collection={collection} onMark={toggle} />
     </>

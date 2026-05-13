@@ -29,19 +29,6 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
   const topTeams    = [...teamStats].sort((a, b) => b.pct - a.pct).slice(0, 5)
   const bottomTeams = [...teamStats].sort((a, b) => a.pct - b.pct).slice(0, 3)
 
-  const confStats = useMemo(() => {
-    return CONFEDERATIONS.map(conf => {
-      const sections = SECTIONS.filter(s => s.type === 'team' && s.confederation === conf)
-      const total    = sections.reduce((sum, s) => sum + s.stickers.length, 0)
-      const owned    = sections.reduce(
-        (sum, s) => sum + s.stickers.filter(st => collection[st.id]?.qty > 0).length,
-        0
-      )
-      const pct = total ? Math.round((owned / total) * 100) : 0
-      return { conf, owned, total, pct }
-    })
-  }, [collection])
-
   return (
     <div className="page">
       {/* Hero */}
@@ -121,25 +108,6 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
 
         {/* Side panel */}
         <div className="side-panel">
-          {/* Rarity breakdown */}
-          <div className="card glass">
-            <div className="section-title">Rarity Breakdown</div>
-            <div className="rarity-item">
-              <div className="rarity-dot foil" />
-              <span className="rarity-label">Foil ✦</span>
-              <span className="rarity-count" style={{ color: 'var(--gold)' }}>{rarityStats.foilOwned}</span>
-            </div>
-            {Object.entries(RARITY_COLORS).map(([key, color]) =>
-              rarityStats[key] > 0 ? (
-                <div key={key} className="rarity-item">
-                  <div className="rarity-dot" style={{ background: color }} />
-                  <span className="rarity-label">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
-                  <span className="rarity-count" style={{ color }}>{rarityStats[key]}</span>
-                </div>
-              ) : null
-            )}
-          </div>
-
           {/* Top teams */}
           <div className="card glass">
             <div className="section-title">Most Complete</div>
@@ -168,24 +136,6 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
             </div>
           )}
 
-          {/* Confederation breakdown */}
-          <div className="card glass">
-            <div className="section-title">By Confederation</div>
-            {confStats.map(({ conf, owned, total, pct }) => (
-              <div key={conf} style={{ marginBottom: 12 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
-                  <span style={{ fontSize: 13, fontWeight: 600 }}>{conf}</span>
-                  <span style={{ fontSize: 12, color: 'var(--text-2)' }}>{owned}/{total}</span>
-                </div>
-                <div className="ts-bar" style={{ width: '100%' }}>
-                  <div
-                    className={`ts-bar-fill${pct === 100 ? ' done' : ''}`}
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </div>

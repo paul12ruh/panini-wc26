@@ -5,6 +5,7 @@ const PAGES = [
   { id: 'album',     label: 'Album',     icon: '⊞' },
   { id: 'missing',   label: 'Missing',   icon: '◌' },
   { id: 'dupes',     label: 'Duplicates', icon: '⊕' },
+  { id: 'stats',     label: 'Stats',      icon: '◈' },
 ]
 
 export default function NavBar({ page, setPage, owned }) {
