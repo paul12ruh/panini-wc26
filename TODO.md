@@ -14,13 +14,18 @@ Owners:
 
 ## Open
 
-- [ ] [dev] Add cool feature ideas backlog — brainstorm and prioritize higher-delight tracker features that fit the app, then break the best ones into buildable TODOs
-- [ ] [dev] Review phone web UX — smoke-test mobile layout, clarify current limitations, and identify improvements beyond the future native app
 - [ ] [dev] Track per-sticker color variants — migrate from single `rarity` to variant inventory so each sticker records total quantity plus base/blue/red/purple/green/black quantities; default new clicks to base, show/save the highest owned color for display, and keep duplicate counts based on total quantity only
+- [ ] [dev] Add mobile quick-add mode — create a phone-first flow for rapidly entering team/number stickers without relying on browser voice support
+- [ ] [dev] Add pack-opening session mode — let the user enter a batch of new stickers, review duplicates/new hits, then commit the pack
+- [ ] [dev] Add trade/share mode — generate a clean shareable missing/duplicates view for trading with other collectors
+- [ ] [dev] Add recent activity and undo history — show recent sticker changes and allow reverting more than the current voice undo toast
+- [ ] [dev] Add collection insights — show useful “cool stats” such as hardest-hit teams, duplicate concentration, variant counts, and progress trends
 - [ ] [future] Native iPhone app for voice input — Web Speech API doesn't work on iOS Safari. Separate React Native / Expo project that reads/writes the same Supabase `collections` table via the user's session
 
 ## Done
 
+- [x] 2026-05-13 — Review phone web UX and document current mobile behavior
+- [x] 2026-05-13 — Add cool feature ideas backlog
 - [x] 2026-05-13 — Verify and clarify cross-device autosave/backup behavior
 - [x] 2026-05-13 — Extend voice input to recognize sticker/player names
 - [x] 2026-05-13 — Add voice input instructions and color parsing

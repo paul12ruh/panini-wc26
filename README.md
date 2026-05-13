@@ -130,3 +130,9 @@ On first sign-in, the app compares the local cache timestamp with the user's Sup
 Signed-in devices should converge through Supabase when they use the same account. An already-open second device refreshes from cloud when the tab/window regains focus or becomes visible again; this is not a live multiplayer stream, so allow the save indicator to finish or refocus/reload the other device before comparing.
 
 Clearing browser data can remove the local cache, but a signed-in user can restore from the Supabase record on the next load.
+
+## Mobile web
+
+The current phone experience is the responsive web app. Under narrow widths, the top navigation becomes a bottom tab bar, the dashboard collapses to one column, and sticker grids use smaller columns for thumb-friendly browsing.
+
+Voice input is hidden on mobile because iOS Safari does not support the Web Speech API used by the browser voice shortcut. Use the Album tab, Missing tab, and future mobile quick-add flow for phone entry. Signed-in phone sessions sync through Supabase the same way desktop sessions do.
