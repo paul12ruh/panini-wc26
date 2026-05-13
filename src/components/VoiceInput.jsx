@@ -115,6 +115,13 @@ const TEAM_NAME_MAP = {
 // Sort multi-word keys longest-first so greedy matching works correctly
 const TEAM_KEYS_SORTED = Object.keys(TEAM_NAME_MAP).sort((a, b) => b.length - a.length)
 
+const escapeRegExp = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+const TEAM_KEY_MATCHERS = TEAM_KEYS_SORTED.map(key => [
+  key,
+  new RegExp(`(^|[^\\p{L}\\p{N}])${escapeRegExp(key).replace(/\s+/g, '\\s+')}(?=$|[^\\p{L}\\p{N}])`, 'u'),
+])
+
 function parseTranscript(raw) {
   const text = raw.toLowerCase().trim()
 
@@ -141,8 +148,8 @@ function parseTranscript(raw) {
 
   // --- extract team code ---
   let teamCode = null
-  for (const key of TEAM_KEYS_SORTED) {
-    if (text.includes(key)) {
+  for (const [key, matcher] of TEAM_KEY_MATCHERS) {
+    if (matcher.test(text)) {
       teamCode = TEAM_NAME_MAP[key]
       break
     }
