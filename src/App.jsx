@@ -18,12 +18,11 @@ export default function App() {
   const {
     collection, get, toggle,
     setQty, setRarity,
-    owned, duplicates, loadCollection,
+    owned, duplicates, loadCollection, lastUpdatedAt,
   } = useCollection()
 
   const { session, loading: authLoading, signIn, signInWithGoogle, signOut } = useAuth()
-
-  useSync(collection, session, loadCollection)
+  const { syncStatus, syncError } = useSync(collection, session, loadCollection, lastUpdatedAt)
 
   if (authLoading) return <div className="auth-loading">Loading…</div>
   if (!session)    return <AuthGate signIn={signIn} signInWithGoogle={signInWithGoogle} />
@@ -32,7 +31,14 @@ export default function App() {
 
   return (
     <>
-      <NavBar page={page} setPage={setPage} owned={owned} signOut={signOut} />
+      <NavBar
+        page={page}
+        setPage={setPage}
+        owned={owned}
+        signOut={signOut}
+        syncStatus={syncStatus}
+        syncError={syncError}
+      />
 
       {page === 'dashboard' && (
         <Dashboard

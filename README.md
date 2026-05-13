@@ -6,7 +6,7 @@ A personal web app for tracking a physical Panini FIFA World Cup 2026 sticker al
 
 This app mirrors the structure of the Panini FIFA World Cup 2026 sticker album. Sign in with Google or an email magic link, mark stickers as collected, track duplicates for trading, tag frame variants, and review what is still missing.
 
-Collection changes are saved locally in the browser and synced to Supabase for signed-in users.
+Collection changes are saved immediately in the browser as a local cache, then synced to Supabase for signed-in users. Supabase is the cross-device source of truth after sign-in; the local cache keeps the app responsive and preserves edits if cloud sync is temporarily unavailable.
 
 ## Features
 
@@ -53,7 +53,7 @@ Collection changes are saved locally in the browser and synced to Supabase for s
 - Google sign-in
 - Email magic-link sign-in
 - Supabase-backed cloud sync through a `collections` table
-- Local `localStorage` persistence under the key `panini-wc2026`
+- Local browser cache under the `localStorage` key `panini-wc2026`
 
 ## Tech stack
 
@@ -63,7 +63,7 @@ Collection changes are saved locally in the browser and synced to Supabase for s
 | Build tool | Vite 5 |
 | Auth / backend | Supabase |
 | Charts | Recharts |
-| Local persistence | `localStorage` |
+| Local cache | `localStorage` |
 | Linting | ESLint 9 |
 
 ## Getting started
@@ -120,8 +120,8 @@ Recommended workflow:
 
 ## Data persistence
 
-Collection data is stored locally in the browser and synced to Supabase after sign-in.
+Collection data is cached locally in the browser and synced to Supabase after sign-in.
 
-On first sign-in, the app attempts to load the user's Supabase collection. If no cloud record exists, the current local collection is inserted as the starting cloud record. Later collection changes are debounced and upserted to Supabase.
+On first sign-in, the app compares the local cache timestamp with the user's Supabase collection timestamp. If no cloud record exists, the current local collection is inserted as the starting cloud record. If both exist, the newer copy wins. Later collection changes are debounced and upserted to Supabase.
 
-Clearing browser data can remove the local copy, but a signed-in user can restore from the Supabase record on the next load.
+Clearing browser data can remove the local cache, but a signed-in user can restore from the Supabase record on the next load.

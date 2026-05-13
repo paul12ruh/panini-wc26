@@ -55,6 +55,7 @@ export function useCollection() {
   const get = useCallback((id) => collection[id] || { qty: 0, rarity: 'base' }, [collection])
 
   const toggle = useCallback((id) => {
+    if (!STICKER_ID_SET.has(id)) return
     setCollection(prev => {
       const next = { ...prev }
       if (next[id]?.qty > 0) {

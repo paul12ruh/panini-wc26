@@ -14,13 +14,13 @@ Owners:
 
 ## Open
 
-- [ ] [dev] Harden collection data validation — normalize localStorage/import/cloud data to known sticker IDs, valid quantities, and supported rarities
-- [ ] [dev] Improve sync error visibility and conflict handling — surface Supabase save/load failures and avoid silently overwriting newer local changes on sign-in
 - [ ] [user] Identify the "00" sticker — figure out what the sticker numbered 00 (appears before FWC-1) actually shows on its face, so it can be added to `src/data/stickers.js`
 - [ ] [future] Native iPhone app for voice input — Web Speech API doesn't work on iOS Safari. Separate React Native / Expo project that reads/writes the same Supabase `collections` table via the user's session
 
 ## Done
 
+- [x] 2026-05-13 — Improve sync error visibility and conflict handling
+- [x] 2026-05-13 — Harden collection data validation for local cache, imports, and cloud payloads
 - [x] 2026-05-13 — Tighten voice input parsing to avoid short team alias substring matches
 - [x] 2026-05-13 — Add Album empty state for search/filter misses
 - [x] 2026-05-13 — Fix sticker edit popover edge cases: stale quantity controls, modal accessibility, and owned-click behavior

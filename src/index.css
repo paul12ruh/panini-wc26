@@ -141,6 +141,23 @@ body {
   flex-shrink: 0;
 }
 .nav-progress strong { color: var(--primary); font-size: 15px; font-weight: 700; }
+.nav-sync {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+  font-size: 11px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+.nav-sync-synced { color: var(--primary); border-color: rgba(0,229,160,0.28); }
+.nav-sync-saving,
+.nav-sync-loading { color: var(--blue); border-color: rgba(77,166,255,0.32); }
+.nav-sync-error { color: #ff6b6b; border-color: rgba(255,107,107,0.4); }
 
 /* ─── PAGE ─────────────────────────────── */
 .page {
@@ -1038,6 +1055,9 @@ body {
   /* Hide brand and progress on mobile; show only the tab links */
   .navbar-brand,
   .nav-progress {
+    display: none;
+  }
+  .nav-sync:not(.nav-sync-error) {
     display: none;
   }
 

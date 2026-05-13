@@ -1,66 +1,155 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
 const DEBOUNCE_MS = 2000
+const toTime = (value) => {
+  const time = value ? new Date(value).getTime() : 0
+  return Number.isFinite(time) ? time : 0
+}
 
-export function useSync(collection, session, loadCollection) {
+export function useSync(collection, session, loadCollection, lastUpdatedAt) {
   const initialLoadDone = useRef(false)
   const isSyncing = useRef(false)
+  const loadedUserId = useRef(null)
   const debounceRef = useRef(null)
+  const skipNextSave = useRef(false)
+  const [syncStatus, setSyncStatus] = useState('idle')
+  const [syncError, setSyncError] = useState('')
 
   // On sign-in: load from Supabase, or upload existing localStorage data
   useEffect(() => {
     if (!session) {
       initialLoadDone.current = false
       isSyncing.current = false
+      loadedUserId.current = null
+      skipNextSave.current = false
       clearTimeout(debounceRef.current)
+      setSyncStatus('idle')
+      setSyncError('')
       return
     }
 
-    if (initialLoadDone.current) return
+    const userId = session.user.id
+    if (loadedUserId.current !== userId) {
+      initialLoadDone.current = false
+      loadedUserId.current = null
+      skipNextSave.current = false
+      clearTimeout(debounceRef.current)
+    }
+
+    if (initialLoadDone.current && loadedUserId.current === userId) return
+    let cancelled = false
 
     const init = async () => {
       isSyncing.current = true
+      setSyncStatus('loading')
+      setSyncError('')
+
       const { data, error } = await supabase
         .from('collections')
-        .select('data')
-        .eq('user_id', session.user.id)
-        .single()
+        .select('data, updated_at')
+        .eq('user_id', userId)
+        .maybeSingle()
 
-      if (error && error.code === 'PGRST116') {
-        // No cloud record yet — push current localStorage data up
-        await supabase.from('collections').insert({
-          user_id: session.user.id,
-          data: collection,
-          updated_at: new Date().toISOString(),
-        })
-      } else if (!error && data?.data) {
-        loadCollection(data.data)
-      } else if (error) {
-        // Let local data remain usable if cloud sync is temporarily unavailable.
+      if (cancelled) {
+        isSyncing.current = false
+        return
+      }
+
+      if (error) {
         console.error('Unable to load collection from Supabase', error)
+        setSyncStatus('error')
+        setSyncError('Cloud sync load failed. Local changes are still available on this device.')
+      } else if (!data) {
+        const updatedAt = lastUpdatedAt || new Date().toISOString()
+        const { error: saveError } = await supabase.from('collections').upsert({
+          user_id: userId,
+          data: collection,
+          updated_at: updatedAt,
+        }, { onConflict: 'user_id' })
+
+        if (cancelled) {
+          isSyncing.current = false
+          return
+        }
+        if (saveError) {
+          console.error('Unable to create Supabase collection', saveError)
+          setSyncStatus('error')
+          setSyncError('Cloud sync setup failed. Changes are saved locally on this device.')
+        } else {
+          setSyncStatus('synced')
+        }
+      } else {
+        const cloudTime = toTime(data.updated_at)
+        const localTime = toTime(lastUpdatedAt)
+
+        if (localTime > cloudTime) {
+          const { error: saveError } = await supabase.from('collections').upsert({
+            user_id: userId,
+            data: collection,
+            updated_at: lastUpdatedAt,
+          }, { onConflict: 'user_id' })
+
+          if (cancelled) {
+            isSyncing.current = false
+            return
+          }
+          if (saveError) {
+            console.error('Unable to save newer local collection to Supabase', saveError)
+            setSyncStatus('error')
+            setSyncError('Cloud sync save failed. Newer local changes remain on this device.')
+          } else {
+            setSyncStatus('synced')
+          }
+        } else {
+          skipNextSave.current = true
+          loadCollection(data.data, data.updated_at)
+          setSyncStatus('synced')
+        }
       }
       initialLoadDone.current = true
+      loadedUserId.current = userId
       isSyncing.current = false
     }
 
     init()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session])
+
+    return () => {
+      cancelled = true
+    }
+  }, [collection, lastUpdatedAt, loadCollection, session])
 
   // Auto-save on collection change (debounced)
   useEffect(() => {
-    if (!session || !initialLoadDone.current || isSyncing.current) return
+    if (!session || !initialLoadDone.current || loadedUserId.current !== session.user.id || isSyncing.current) return
+
+    if (skipNextSave.current) {
+      skipNextSave.current = false
+      return
+    }
 
     clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(async () => {
-      await supabase.from('collections').upsert({
+      setSyncStatus('saving')
+      setSyncError('')
+      const updatedAt = lastUpdatedAt || new Date().toISOString()
+      const { error } = await supabase.from('collections').upsert({
         user_id: session.user.id,
         data: collection,
-        updated_at: new Date().toISOString(),
-      })
+        updated_at: updatedAt,
+      }, { onConflict: 'user_id' })
+
+      if (error) {
+        console.error('Unable to save collection to Supabase', error)
+        setSyncStatus('error')
+        setSyncError('Cloud sync save failed. Changes are saved locally on this device.')
+      } else {
+        setSyncStatus('synced')
+      }
     }, DEBOUNCE_MS)
 
     return () => clearTimeout(debounceRef.current)
-  }, [collection, session])
+  }, [collection, lastUpdatedAt, session])
+
+  return { syncStatus, syncError }
 }

@@ -8,8 +8,14 @@ const PAGES = [
   { id: 'stats',     label: 'Stats',      icon: '◈' },
 ]
 
-export default function NavBar({ page, setPage, owned, signOut }) {
+export default function NavBar({ page, setPage, owned, signOut, syncStatus, syncError }) {
   const pct = Math.round((owned / TOTAL) * 100)
+  const syncLabel = syncError || (
+    syncStatus === 'saving' ? 'Saving collection' :
+    syncStatus === 'loading' ? 'Loading collection' :
+    syncStatus === 'synced' ? 'Collection synced' :
+    'Collection sync idle'
+  )
 
   return (
     <nav className="navbar">
@@ -34,6 +40,9 @@ export default function NavBar({ page, setPage, owned, signOut }) {
       <div className="nav-progress">
         <strong>{pct}%</strong>
         <span>{owned}/{TOTAL}</span>
+      </div>
+      <div className={`nav-sync nav-sync-${syncStatus}`} title={syncLabel} aria-label={syncLabel}>
+        {syncStatus === 'error' ? '!' : syncStatus === 'saving' || syncStatus === 'loading' ? '...' : '✓'}
       </div>
       <button className="nav-signout" onClick={signOut} title="Sign out" aria-label="Sign out">↪</button>
     </nav>
