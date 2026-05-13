@@ -1,4 +1,5 @@
 import { memo, useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
 const RARITIES = [
   { key: 'base',   label: 'Base',   color: '#555'    },
@@ -76,26 +77,7 @@ function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetRarity }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [open])
 
-  return (
-    <>
-      <div
-        ref={ref}
-        className={`sticker-slot ${owned ? 'owned' : ''} ${rarityClass}`}
-        onClick={handleClick}
-        onKeyDown={handleKeyDown}
-        role="button"
-        tabIndex={0}
-        aria-pressed={owned}
-        title={`${sticker.id} — ${sticker.name}`}
-      >
-        {owned && <div className="sticker-check">✓</div>}
-        {owned && <span className="sticker-edit" aria-hidden="true">⋯</span>}
-        {isDup  && <div className="sticker-qty">×{entry.qty}</div>}
-        <div className="sticker-id">{sticker.id}</div>
-        <div className="sticker-name">{sticker.name}</div>
-      </div>
-
-      {open && (
+  const controls = open ? createPortal(
         <>
           <div className="popover-overlay" onClick={closeControls} />
           <div
@@ -155,8 +137,30 @@ function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetRarity }) {
               ✕ Unmark sticker
             </button>
           </div>
-        </>
-      )}
+        </>,
+        document.body
+  ) : null
+
+  return (
+    <>
+      <div
+        ref={ref}
+        className={`sticker-slot ${owned ? 'owned' : ''} ${rarityClass}`}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        role="button"
+        tabIndex={0}
+        aria-pressed={owned}
+        title={`${sticker.id} — ${sticker.name}`}
+      >
+        {owned && <div className="sticker-check">✓</div>}
+        {owned && <span className="sticker-edit" aria-hidden="true">⋯</span>}
+        {isDup  && <div className="sticker-qty">×{entry.qty}</div>}
+        <div className="sticker-id">{sticker.id}</div>
+        <div className="sticker-name">{sticker.name}</div>
+      </div>
+
+      {controls}
     </>
   )
 }

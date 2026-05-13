@@ -98,11 +98,14 @@ export default function Missing({ collection }) {
             <span className="group-name">{g.name}</span>
             <span className="group-count">{g.missing.length} missing</span>
           </div>
-          <div className="list-stickers">
+          <div className="missing-table">
             {g.missing.map(s => (
-              <div key={s.id} className={`list-chip ${s.type === 'foil' ? 'rarity-blue' : ''}`}>
-                <span className="chip-id">{s.id}</span>
-                <span style={{ color: 'var(--text-3)', fontSize: 11 }}>{s.name}</span>
+              <div key={s.id} className="missing-row">
+                <span className="missing-id">{s.id}</span>
+                <span className="missing-name">{s.name}</span>
+                <span className={`missing-type ${s.type === 'foil' ? 'foil' : ''}`}>
+                  {s.type === 'foil' ? 'Foil' : 'Base'}
+                </span>
               </div>
             ))}
           </div>
