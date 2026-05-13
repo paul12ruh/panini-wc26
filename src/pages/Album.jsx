@@ -2,7 +2,9 @@ import { useState, useMemo, useEffect } from 'react'
 import { SECTIONS, CONFEDERATIONS } from '../data/stickers'
 import StickerSlot from '../components/StickerSlot'
 
-export default function Album({ collection, get, toggle, setQty, setRarity, focusSection, setFocusSection }) {
+const DEFAULT_ENTRY = { qty: 0, rarity: 'base' }
+
+export default function Album({ collection, get, toggle, setQty, setRarity, focusSection, setFocusSection, setPage }) {
   const [search,      setSearch]      = useState('')
   const [filter,      setFilter]      = useState('All')
   const [expanded,    setExpanded]    = useState({})
@@ -56,6 +58,9 @@ export default function Album({ collection, get, toggle, setQty, setRarity, focu
   return (
     <div className="page">
       <div className="page-header">
+        <button className="btn btn-ghost" style={{ marginBottom: 8, fontSize: 13 }} onClick={() => setPage('dashboard')}>
+          ← Dashboard
+        </button>
         <div className="page-title">Album</div>
         <div className="page-subtitle">Click a sticker to mark it owned · click again to adjust quantity & frame</div>
       </div>
@@ -120,7 +125,7 @@ export default function Album({ collection, get, toggle, setQty, setRarity, focu
                     <StickerSlot
                       key={sticker.id}
                       sticker={sticker}
-                      entry={get(sticker.id)}
+                      entry={collection[sticker.id] ?? DEFAULT_ENTRY}
                       onToggle={toggle}
                       onSetQty={setQty}
                       onSetRarity={setRarity}

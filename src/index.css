@@ -519,6 +519,25 @@ body {
   color: #000;
   font-weight: 900;
 }
+.sticker-unmark {
+  position: absolute;
+  top: 4px; right: 4px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: var(--text-2);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s;
+  z-index: 2;
+}
+.sticker-slot:hover .sticker-unmark,
+.sticker-slot.owned .sticker-unmark { opacity: 1; }
+.sticker-unmark:hover { background: rgba(255,80,80,0.5); color: #fff; }
 
 /* controls popover */
 .sticker-controls {
@@ -541,6 +560,12 @@ body {
 }
 .controls-title { font-size: 10px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.07em; }
 .controls-sticker-id { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 800; color: var(--text); }
+.controls-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
 .qty-row { display: flex; align-items: center; gap: 8px; }
 .qty-btn {
   width: 26px; height: 26px;

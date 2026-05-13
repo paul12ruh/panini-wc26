@@ -38,6 +38,7 @@ export default function App() {
           {...sharedProps}
           focusSection={focusSection}
           setFocusSection={setFocusSection}
+          setPage={setPage}
         />
       )}
       {page === 'missing' && <Missing   collection={collection} />}

@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect } from 'react'
+import { memo, useState, useRef, useEffect } from 'react'
 
 const TYPE_ICON = { foil: '✦', base: '○' }
 
-export default function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetRarity }) {
+function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetRarity }) {
   const [open, setOpen] = useState(false)
   const [pos,  setPos]  = useState({ top: 0, left: 0 })
   const ref = useRef(null)
@@ -31,6 +31,11 @@ export default function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetR
     openControls(e)
   }
 
+  const handleUnmark = (e) => {
+    e.stopPropagation()
+    onToggle(sticker.id)
+  }
+
   useEffect(() => {
     if (!open) return
     const close = () => setOpen(false)
@@ -47,6 +52,7 @@ export default function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetR
         title={`${sticker.id} — ${sticker.name}`}
       >
         {owned && <div className="sticker-check">✓</div>}
+        {owned && <button className="sticker-unmark" onClick={handleUnmark}>×</button>}
         {isDup  && <div className="sticker-qty">×{entry.qty}</div>}
         <div className="sticker-id">{sticker.id}</div>
         <div className="sticker-icon">{TYPE_ICON[sticker.type] || '○'}</div>
@@ -61,14 +67,12 @@ export default function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetR
             style={{ top: pos.top, left: pos.left }}
             onClick={e => e.stopPropagation()}
           >
-            <div>
-              <div className="controls-title">Sticker</div>
-              <div className="controls-sticker-id">{sticker.id} — {sticker.name}</div>
-            </div>
-
-            {/* Frame / rarity */}
-            <div>
-              <div className="controls-title" style={{ marginBottom: 6 }}>Frame</div>
+            {/* Header row: sticker ID/name on left, rarity swatches on right */}
+            <div className="controls-header">
+              <div>
+                <div className="controls-title">Sticker</div>
+                <div className="controls-sticker-id">{sticker.id} — {sticker.name}</div>
+              </div>
               <div className="rarity-swatches">
                 {[
                   { key: 'base',   color: '#555'    },
@@ -112,3 +116,5 @@ export default function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetR
     </>
   )
 }
+
+export default memo(StickerSlot)
