@@ -54,21 +54,29 @@ Paul works as the product owner. The active Claude Code session is the **orchest
 - Orchestrator owns: task list, sequencing, reviewing diffs, integration, the final push
 - Spawn sub-agents (via the Agent tool) for bounded implementation, investigation, or parallel work
 - Each sub-agent gets a clear responsibility and ideally non-overlapping file ownership
+- **Sub-agents must work on a separate branch.** Use the Agent tool's `isolation: "worktree"` parameter — it creates an isolated git worktree on a temp branch, so the sub-agent's commits never land on `main` until the orchestrator reviews and merges them
 - **Sub-agents must commit their own work** — always include "commit your changes with a focused message before finishing" in the agent prompt
-- After a sub-agent finishes, the orchestrator inspects the diff before accepting it
+- After a sub-agent finishes, orchestrator: (1) reviews the diff, (2) merges the branch into `main` only if it passes review, (3) deletes the temp branch
 - Don't mix unrelated local edits into a task commit
 - At end of session, orchestrator pushes after confirming working tree is clean
 
-Paul prefers the orchestrator stay hands-off on large implementations — delegate, don't dive in. Small fixes (1-2 file edits) are fine to do directly.
+Paul prefers the orchestrator stay hands-off on large implementations — delegate, don't dive in. Small fixes (1-2 file edits) are fine to do directly on `main`.
 
 ## Commit Principles
 
-- Commit after each coherent task, not just at the end
-- Keep commits small enough to review and revert independently
+- **Commit frequently** — after every coherent change, not at the end of a long stretch. Paul has called this out explicitly: small, frequent, focused commits over big batched ones
+- Each commit should be small enough to review and revert independently
 - Message form: `area: concise change summary` (e.g. `album: improve sticker controls`)
 - `git add -A` is risky here — there may be untracked files from other tools (CODEX.md, etc). Prefer `git add <specific files>` or check `git status` first
 - Never commit `.env` (gitignored)
 - Don't push without explicit ask
+
+## Branch Hygiene
+
+- Orchestrator's small fixes: directly on `main` is fine, push when asked
+- Sub-agent work: **always on a separate branch** (worktree isolation), merged into `main` only after orchestrator review
+- Never let two parallel sub-agents touch the same files — assign non-overlapping file ownership per task
+- If a sub-agent branch fails review, the branch stays unmerged; fix-up or discard rather than force-merging
 
 ## Codebase Preferences
 

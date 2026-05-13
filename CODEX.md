@@ -38,7 +38,8 @@ Use one orchestrator agent as the owner of each session.
 - The orchestrator keeps the overall task list, decides sequencing, reviews work, integrates changes, and owns the final push.
 - Spawn sub-agents for bounded implementation, investigation, or verification tasks when work can proceed in parallel.
 - Give each sub-agent a clear responsibility and file/module ownership to avoid overlapping edits.
-- Sub-agents should commit their own completed work frequently with focused commit messages.
+- **Sub-agents must work on a separate branch.** Never run a sub-agent that commits directly to `main`. Use git worktrees or feature branches so the orchestrator can review before merging.
+- Sub-agents must commit their own work frequently with focused commit messages — small, frequent commits over big batches.
 - The orchestrator should inspect sub-agent results before continuing, resolve integration issues, and make follow-up commits as needed.
 - Do not leave unrelated local edits mixed into task commits. If unrelated changes already exist, preserve them and work around them.
 - At the end of every session, the orchestrator pushes the completed session branch after confirming the working tree and test/build status.
