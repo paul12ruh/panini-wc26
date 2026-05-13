@@ -19,6 +19,7 @@ Owners:
 
 ## Done
 
+- [x] 2026-05-13 — Add CSV export to the trade sheet tools
 - [x] 2026-05-13 — Simplify Missing tab rows to show only missing sticker IDs and names
 - [x] 2026-05-13 — Clean up Tools page ordering and section demarcation
 - [x] 2026-05-13 — Add collection insights

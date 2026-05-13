@@ -646,6 +646,7 @@ body {
   gap: 8px;
   align-items: center;
 }
+.tool-actions-wrap { flex-wrap: wrap; }
 .tool-input,
 .tool-select,
 .tool-textarea {

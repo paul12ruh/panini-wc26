@@ -50,6 +50,70 @@ const writeClipboard = async (text) => {
   if (!copied) throw new Error('Clipboard unavailable')
 }
 
+const downloadTextFile = (filename, text, type) => {
+  const blob = new Blob([text], { type })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  setTimeout(() => URL.revokeObjectURL(url), 0)
+}
+
+const csvValue = (value) => {
+  const text = String(value ?? '')
+  return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text
+}
+
+const buildTradeRows = (collection) => {
+  const rows = []
+
+  SECTIONS.forEach(section => {
+    section.stickers.forEach(sticker => {
+      const qty = collection[sticker.id]?.qty || 0
+      if (qty <= 0) {
+        rows.push({
+          type: 'missing',
+          section: section.name,
+          stickerId: sticker.id,
+          name: sticker.name,
+          quantity: 0,
+          extraDuplicates: '',
+        })
+      } else if (qty > 1) {
+        rows.push({
+          type: 'duplicate',
+          section: section.name,
+          stickerId: sticker.id,
+          name: sticker.name,
+          quantity: qty,
+          extraDuplicates: qty - 1,
+        })
+      }
+    })
+  })
+
+  return rows
+}
+
+const buildTradeCsv = (collection) => {
+  const headers = ['type', 'section', 'sticker_id', 'name', 'quantity', 'extra_duplicates']
+  const rows = buildTradeRows(collection).map(row => [
+    row.type,
+    row.section,
+    row.stickerId,
+    row.name,
+    row.quantity,
+    row.extraDuplicates,
+  ])
+
+  return [headers, ...rows]
+    .map(row => row.map(csvValue).join(','))
+    .join('\n')
+}
+
 const buildTradeText = (collection) => {
   const missing = []
   const duplicates = []
@@ -90,6 +154,7 @@ export default function Tools({ collection, setRarity, activity, undoLastActivit
   const [copied, setCopied] = useState(false)
 
   const tradeText = useMemo(() => buildTradeText(collection), [collection])
+  const tradeCsv = useMemo(() => buildTradeCsv(collection), [collection])
 
   const insights = useMemo(() => {
     const ownedSections = SECTIONS.map(section => {
@@ -155,6 +220,10 @@ export default function Tools({ collection, setRarity, activity, undoLastActivit
         setTimeout(() => setCopied(false), 1800)
       })
       .catch(() => setCopied(false))
+  }
+
+  const handleExportTradeCsv = () => {
+    downloadTextFile('panini-wc26-trade-sheet.csv', tradeCsv, 'text/csv;charset=utf-8')
   }
 
   return (
@@ -260,7 +329,10 @@ export default function Tools({ collection, setRarity, activity, undoLastActivit
           <section className="tool-panel glass">
             <div className="section-title">Trade Sheet</div>
             <textarea className="tool-textarea trade-textarea" value={tradeText} readOnly aria-label="Trade sheet" />
-            <button className="btn btn-primary" onClick={handleCopyTrade}>{copied ? 'Copied' : 'Copy trade sheet'}</button>
+            <div className="tool-actions tool-actions-wrap">
+              <button className="btn btn-primary" onClick={handleCopyTrade}>{copied ? 'Copied' : 'Copy trade sheet'}</button>
+              <button className="btn btn-ghost" onClick={handleExportTradeCsv}>Export CSV</button>
+            </div>
           </section>
         </section>
       </div>
