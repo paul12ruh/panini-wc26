@@ -131,6 +131,39 @@ Signed-in devices should converge through Supabase when they use the same accoun
 
 Clearing browser data can remove the local cache, but a signed-in user can restore from the Supabase record on the next load.
 
+## Shared Albums Plan
+
+The current production sync model is one collection per signed-in user: `collections.user_id` is scoped by RLS to `auth.uid()`. Shared collecting should be added as an album-based model rather than by sharing a password or bypassing RLS.
+
+Planned backend shape:
+
+```sql
+albums (
+  id uuid primary key,
+  name text not null,
+  owner_id uuid not null references auth.users(id),
+  created_at timestamptz not null default now()
+)
+
+album_members (
+  album_id uuid references albums(id) on delete cascade,
+  user_id uuid references auth.users(id) on delete cascade,
+  role text not null check (role in ('owner', 'editor', 'viewer')),
+  created_at timestamptz not null default now(),
+  primary key (album_id, user_id)
+)
+
+collections (
+  album_id uuid primary key references albums(id) on delete cascade,
+  data jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+)
+```
+
+RLS should allow users to read/write collections only when they are members of the album, with writes limited to `owner` and `editor`. The existing personal collection can become the user's first private album during migration.
+
+For shared editing, whole-document saves are acceptable for the first implementation but are not ideal for simultaneous edits. A later activity/event model can store per-sticker mutations so two collaborators do not overwrite nearby changes.
+
 ## Mobile web
 
 The current phone experience is the responsive web app. Under narrow widths, the top navigation becomes a bottom tab bar, the dashboard collapses to one column, and sticker grids use smaller columns for thumb-friendly browsing.

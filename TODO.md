@@ -14,6 +14,10 @@ Owners:
 
 ## Open
 
+- [ ] [dev] Add shared album database migration — create `albums`, `album_members`, invite support, and RLS policies so multiple users can read/write one collection
+- [ ] [dev] Add shared album selector and invite UI — let users create/switch albums, invite collaborators, and view member roles
+- [ ] [dev] Migrate personal collection sync to album-based sync — move from `collections.user_id` ownership to `collections.album_id`, preserving existing personal data
+- [ ] [dev] Add shared edit conflict/activity handling — avoid whole-collection overwrite issues when multiple collaborators edit close together
 - [ ] [dev] Add mobile quick-add mode — create a phone-first flow for rapidly entering team/number stickers without relying on browser voice support
 - [ ] [dev] Add pack-opening session mode — let the user enter a batch of new stickers, review duplicates/new hits, then commit the pack
 - [ ] [dev] Add trade/share mode — generate a clean shareable missing/duplicates view for trading with other collectors

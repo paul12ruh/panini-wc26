@@ -20,7 +20,7 @@ This is a Vite + React app for tracking a Panini FIFA World Cup 2026 sticker alb
 - Hosting: Vercel — auto-deploys on push to `main`, branches get preview URLs
 - Backend: Supabase project ref `wjnttgjbcttabpjzamoh` (URL: https://wjnttgjbcttabpjzamoh.supabase.co)
 - Auth providers enabled: Google OAuth + Email magic link
-- Database: table `collections` (user_id uuid PK → auth.users, data jsonb, updated_at timestamptz) with RLS policy `auth.uid() = user_id`
+- Database: current production table is `collections` (user_id uuid PK → auth.users, data jsonb, updated_at timestamptz) with RLS policy `auth.uid() = user_id`; shared album migration SQL lives in `supabase/migrations/`
 - Env vars `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` must be set in both `.env` (local) and Vercel → Project Settings → Environment Variables
 
 ## Common Commands
@@ -89,7 +89,7 @@ When asked to let agents test and improve the app, use a bounded QA mission rath
 ## Codebase Preferences
 
 - Follow existing React function component and hook patterns.
-- Keep collection records shaped as `{ [stickerId]: { qty, rarity } }` unless a migration is intentionally planned.
+- Collection records are shaped as `{ [stickerId]: { qty, rarity, variants } }`, where `qty` is total owned, `rarity` is the highest owned color for display, and `variants` stores base/blue/red/purple/green/black quantities.
 - Use `SECTIONS`, `ALL_STICKERS`, and `TOTAL` from `src/data/stickers.js` rather than duplicating sticker metadata.
 - Preserve both local persistence and Supabase sync behavior when changing collection logic.
 - Keep UI changes consistent with the current compact dashboard/album tool style.

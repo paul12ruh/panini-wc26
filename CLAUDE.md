@@ -23,7 +23,7 @@ Vite + React app for tracking a Panini FIFA World Cup 2026 sticker album.
 | Backend | Supabase project ref `wjnttgjbcttabpjzamoh` |
 | Supabase URL | https://wjnttgjbcttabpjzamoh.supabase.co |
 | Auth providers enabled | Google OAuth + Email magic link |
-| Database table | `collections` (user_id uuid PK → auth.users, data jsonb, updated_at timestamptz) with Row Level Security: `auth.uid() = user_id` |
+| Database table | Current production: `collections` (user_id uuid PK → auth.users, data jsonb, updated_at timestamptz) with Row Level Security: `auth.uid() = user_id`; shared album migration SQL is in `supabase/migrations/` |
 
 **Env vars** — must be set identically in `.env` (local) and Vercel → Project Settings → Environment Variables:
 - `VITE_SUPABASE_URL`
@@ -85,7 +85,7 @@ Paul prefers the orchestrator stay hands-off on large implementations — delega
 ## Codebase Preferences
 
 - Function components + hooks; no class components
-- Collection record shape: `{ [stickerId]: { qty, rarity } }` — don't change without migration plan
+- Collection record shape: `{ [stickerId]: { qty, rarity, variants } }` — `qty` is total owned, `rarity` is the highest owned color for display, and `variants` stores base/blue/red/purple/green/black quantities
 - Use `SECTIONS`, `ALL_STICKERS`, `TOTAL` from `src/data/stickers.js`; don't duplicate sticker metadata
 - Any change to collection logic must preserve both localStorage persistence and Supabase sync
 - UI style: dark glass morphism, compact, CSS variables in `src/index.css` `:root`
