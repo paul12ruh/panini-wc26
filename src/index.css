@@ -681,6 +681,17 @@ body {
   color: var(--text-2);
   font-size: 12px;
 }
+.tool-warning {
+  margin-top: 8px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,92,92,0.32);
+  background: rgba(255,92,92,0.09);
+  color: #ffb8b8;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.tool-warning strong { color: #ffdddd; }
 .activity-list {
   display: flex;
   flex-direction: column;

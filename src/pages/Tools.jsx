@@ -151,6 +151,7 @@ export default function Tools({ collection, setRarity, activity, undoLastActivit
   const [packText, setPackText] = useState('')
   const [packRarity, setPackRarity] = useState('base')
   const [packMessage, setPackMessage] = useState('')
+  const [packMisses, setPackMisses] = useState([])
   const [copied, setCopied] = useState(false)
 
   const tradeText = useMemo(() => buildTradeText(collection), [collection])
@@ -209,6 +210,7 @@ export default function Tools({ collection, setRarity, activity, undoLastActivit
       else missed.push(token)
     })
 
+    setPackMisses(missed)
     setPackMessage(`Added ${added.length} sticker${added.length === 1 ? '' : 's'}${missed.length ? `; ${missed.length} not found.` : '.'}`)
     if (!missed.length) setPackText('')
   }
@@ -277,6 +279,11 @@ export default function Tools({ collection, setRarity, activity, undoLastActivit
                 <button className="btn btn-primary" onClick={handleCommitPack}>Commit Pack</button>
               </div>
               {packMessage && <div className="tool-note">{packMessage}</div>}
+              {packMisses.length > 0 && (
+                <div className="tool-warning" role="status">
+                  <strong>Not found:</strong> {packMisses.join(', ')}
+                </div>
+              )}
             </section>
           </div>
         </section>

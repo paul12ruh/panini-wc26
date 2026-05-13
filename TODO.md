@@ -20,6 +20,7 @@ Owners:
 
 ## Done
 
+- [x] 2026-05-13 — Show exact unmatched entries after pack opening import
 - [x] 2026-05-13 — Align dashboard side cards with Team Completion panel
 - [x] 2026-05-13 — Replace default Vite link metadata with Panini WC26 site metadata
 - [x] 2026-05-13 — Remove incorrect synthetic 00 sticker from album data
