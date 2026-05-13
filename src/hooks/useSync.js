@@ -15,6 +15,7 @@ export function useSync(collection, session, loadCollection, lastUpdatedAt) {
   const skipNextSave = useRef(false)
   const [syncStatus, setSyncStatus] = useState('idle')
   const [syncError, setSyncError] = useState('')
+  const [lastSyncedAt, setLastSyncedAt] = useState(null)
 
   // On sign-in: load from Supabase, or upload existing localStorage data
   useEffect(() => {
@@ -26,6 +27,7 @@ export function useSync(collection, session, loadCollection, lastUpdatedAt) {
       clearTimeout(debounceRef.current)
       setSyncStatus('idle')
       setSyncError('')
+      setLastSyncedAt(null)
       return
     }
 
@@ -77,6 +79,7 @@ export function useSync(collection, session, loadCollection, lastUpdatedAt) {
           setSyncStatus('error')
           setSyncError('Cloud sync setup failed. Changes are saved locally on this device.')
         } else {
+          setLastSyncedAt(updatedAt)
           setSyncStatus('synced')
         }
       } else {
@@ -99,11 +102,13 @@ export function useSync(collection, session, loadCollection, lastUpdatedAt) {
             setSyncStatus('error')
             setSyncError('Cloud sync save failed. Newer local changes remain on this device.')
           } else {
+            setLastSyncedAt(lastUpdatedAt)
             setSyncStatus('synced')
           }
         } else {
           skipNextSave.current = true
           loadCollection(data.data, data.updated_at)
+          setLastSyncedAt(data.updated_at)
           setSyncStatus('synced')
         }
       }
@@ -144,6 +149,7 @@ export function useSync(collection, session, loadCollection, lastUpdatedAt) {
         setSyncStatus('error')
         setSyncError('Cloud sync save failed. Changes are saved locally on this device.')
       } else {
+        setLastSyncedAt(updatedAt)
         setSyncStatus('synced')
       }
     }, DEBOUNCE_MS)
@@ -151,5 +157,43 @@ export function useSync(collection, session, loadCollection, lastUpdatedAt) {
     return () => clearTimeout(debounceRef.current)
   }, [collection, lastUpdatedAt, session])
 
-  return { syncStatus, syncError }
+  useEffect(() => {
+    if (!session) return
+
+    const refreshFromCloud = async () => {
+      if (document.visibilityState === 'hidden') return
+      if (!initialLoadDone.current || loadedUserId.current !== session.user.id || isSyncing.current) return
+
+      const { data, error } = await supabase
+        .from('collections')
+        .select('data, updated_at')
+        .eq('user_id', session.user.id)
+        .maybeSingle()
+
+      if (error) {
+        console.error('Unable to refresh collection from Supabase', error)
+        setSyncStatus('error')
+        setSyncError('Cloud sync refresh failed. Local changes are still available on this device.')
+        return
+      }
+
+      if (data && toTime(data.updated_at) > toTime(lastUpdatedAt)) {
+        skipNextSave.current = true
+        loadCollection(data.data, data.updated_at)
+        setLastSyncedAt(data.updated_at)
+        setSyncStatus('synced')
+        setSyncError('')
+      }
+    }
+
+    window.addEventListener('focus', refreshFromCloud)
+    document.addEventListener('visibilitychange', refreshFromCloud)
+
+    return () => {
+      window.removeEventListener('focus', refreshFromCloud)
+      document.removeEventListener('visibilitychange', refreshFromCloud)
+    }
+  }, [lastUpdatedAt, loadCollection, session])
+
+  return { syncStatus, syncError, lastSyncedAt }
 }

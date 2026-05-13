@@ -16,12 +16,12 @@ Owners:
 
 - [ ] [dev] Add cool feature ideas backlog — brainstorm and prioritize higher-delight tracker features that fit the app, then break the best ones into buildable TODOs
 - [ ] [dev] Review phone web UX — smoke-test mobile layout, clarify current limitations, and identify improvements beyond the future native app
-- [ ] [dev] Verify cross-device autosave/backup behavior — confirm signed-in computer and phone collections converge through Supabase, clarify debounce/offline behavior, and improve UI if sync state is not obvious enough
 - [ ] [dev] Track per-sticker color variants — migrate from single `rarity` to variant inventory so each sticker records total quantity plus base/blue/red/purple/green/black quantities; default new clicks to base, show/save the highest owned color for display, and keep duplicate counts based on total quantity only
 - [ ] [future] Native iPhone app for voice input — Web Speech API doesn't work on iOS Safari. Separate React Native / Expo project that reads/writes the same Supabase `collections` table via the user's session
 
 ## Done
 
+- [x] 2026-05-13 — Verify and clarify cross-device autosave/backup behavior
 - [x] 2026-05-13 — Extend voice input to recognize sticker/player names
 - [x] 2026-05-13 — Add voice input instructions and color parsing
 - [x] 2026-05-13 — Change Album filters from confederations to groups

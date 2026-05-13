@@ -23,7 +23,7 @@ export default function App() {
 
   const { session, loading: authLoading, signIn, signInWithGoogle, signOut } = useAuth()
   const syncSession = session?.__mock ? null : session
-  const { syncStatus, syncError } = useSync(collection, syncSession, loadCollection, lastUpdatedAt)
+  const { syncStatus, syncError, lastSyncedAt } = useSync(collection, syncSession, loadCollection, lastUpdatedAt)
 
   if (authLoading) return <div className="auth-loading">Loading…</div>
   if (!session)    return <AuthGate signIn={signIn} signInWithGoogle={signInWithGoogle} />
@@ -39,6 +39,8 @@ export default function App() {
         signOut={signOut}
         syncStatus={syncStatus}
         syncError={syncError}
+        lastSyncedAt={lastSyncedAt}
+        syncDisabled={Boolean(session?.__mock)}
       />
 
       {page === 'dashboard' && (

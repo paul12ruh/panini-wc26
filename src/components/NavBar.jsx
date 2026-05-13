@@ -8,12 +8,16 @@ const PAGES = [
   { id: 'stats',     label: 'Stats',      icon: '◈' },
 ]
 
-export default function NavBar({ page, setPage, owned, signOut, syncStatus, syncError }) {
+export default function NavBar({ page, setPage, owned, signOut, syncStatus, syncError, lastSyncedAt, syncDisabled }) {
   const pct = Math.round((owned / TOTAL) * 100)
+  const syncedTime = lastSyncedAt
+    ? new Date(lastSyncedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+    : null
   const syncLabel = syncError || (
+    syncDisabled ? 'Local dev mode' :
     syncStatus === 'saving' ? 'Saving collection' :
     syncStatus === 'loading' ? 'Loading collection' :
-    syncStatus === 'synced' ? 'Collection synced' :
+    syncStatus === 'synced' ? `Synced${syncedTime ? ` ${syncedTime}` : ''}` :
     'Collection sync idle'
   )
 
@@ -42,7 +46,7 @@ export default function NavBar({ page, setPage, owned, signOut, syncStatus, sync
         <span>{owned}/{TOTAL}</span>
       </div>
       <div
-        className={`nav-sync nav-sync-${syncStatus}`}
+        className={`nav-sync nav-sync-${syncDisabled ? 'local' : syncStatus}`}
         title={syncLabel}
         role="status"
         aria-live="polite"
@@ -50,7 +54,7 @@ export default function NavBar({ page, setPage, owned, signOut, syncStatus, sync
         <span aria-hidden="true">
           {syncStatus === 'error' ? '!' : syncStatus === 'saving' || syncStatus === 'loading' ? '...' : '✓'}
         </span>
-        <span className="nav-sync-text">{syncStatus === 'error' ? syncLabel : ''}</span>
+        <span className="nav-sync-text">{syncLabel}</span>
       </div>
       <button className="nav-signout" onClick={signOut} title="Sign out" aria-label="Sign out">↪</button>
     </nav>

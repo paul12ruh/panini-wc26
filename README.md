@@ -125,6 +125,8 @@ Recommended workflow:
 
 Collection data is cached locally in the browser and synced to Supabase after sign-in.
 
-On first sign-in, the app compares the local cache timestamp with the user's Supabase collection timestamp. If no cloud record exists, the current local collection is inserted as the starting cloud record. If both exist, the newer copy wins. Later collection changes are debounced and upserted to Supabase.
+On first sign-in, the app compares the local cache timestamp with the user's Supabase collection timestamp. If no cloud record exists, the current local collection is inserted as the starting cloud record. If both exist, the newer copy wins. Later collection changes are debounced for about two seconds and upserted to Supabase.
+
+Signed-in devices should converge through Supabase when they use the same account. An already-open second device refreshes from cloud when the tab/window regains focus or becomes visible again; this is not a live multiplayer stream, so allow the save indicator to finish or refocus/reload the other device before comparing.
 
 Clearing browser data can remove the local cache, but a signed-in user can restore from the Supabase record on the next load.

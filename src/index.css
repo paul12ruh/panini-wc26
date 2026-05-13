@@ -160,6 +160,7 @@ body {
 .nav-sync-saving,
 .nav-sync-loading { color: var(--blue); border-color: rgba(77,166,255,0.32); }
 .nav-sync-error { color: #ff6b6b; border-color: rgba(255,107,107,0.4); }
+.nav-sync-local { color: var(--text-2); border-color: var(--border-2); }
 .nav-sync-text {
   max-width: 220px;
   overflow: hidden;
