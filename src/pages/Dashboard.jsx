@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { SECTIONS, TOTAL, ALL_STICKERS } from '../data/stickers'
+import { SECTIONS, TOTAL, ALL_STICKERS, CONFEDERATIONS } from '../data/stickers'
 
 export default function Dashboard({ collection, owned, duplicates, setPage, setFocusSection }) {
   const needed = TOTAL - owned
@@ -17,6 +17,7 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
     return { blue, green, foilOwned }
   }, [collection])
 
+  // Album order — no sort, matches physical SECTIONS order
   const teamStats = useMemo(() => {
     return SECTIONS
       .filter(s => s.type === 'team')
@@ -24,11 +25,24 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
         const ownedCount = s.stickers.filter(st => collection[st.id]?.qty > 0).length
         return { ...s, ownedCount, pct: Math.round((ownedCount / s.stickers.length) * 100) }
       })
-      .sort((a, b) => b.pct - a.pct)
   }, [collection])
 
-  const topTeams    = teamStats.slice(0, 5)
+  // Side-panel rankings remain sorted by completion %
+  const topTeams    = [...teamStats].sort((a, b) => b.pct - a.pct).slice(0, 5)
   const bottomTeams = [...teamStats].sort((a, b) => a.pct - b.pct).slice(0, 3)
+
+  const confStats = useMemo(() => {
+    return CONFEDERATIONS.map(conf => {
+      const sections = SECTIONS.filter(s => s.type === 'team' && s.confederation === conf)
+      const total    = sections.reduce((sum, s) => sum + s.stickers.length, 0)
+      const owned    = sections.reduce(
+        (sum, s) => sum + s.stickers.filter(st => collection[st.id]?.qty > 0).length,
+        0
+      )
+      const pct = total ? Math.round((owned / total) * 100) : 0
+      return { conf, owned, total, pct }
+    })
+  }, [collection])
 
   return (
     <div className="page">
@@ -156,6 +170,25 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
               ))}
             </div>
           )}
+
+          {/* Confederation breakdown */}
+          <div className="card glass">
+            <div className="section-title">By Confederation</div>
+            {confStats.map(({ conf, owned, total, pct }) => (
+              <div key={conf} style={{ marginBottom: 12 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+                  <span style={{ fontSize: 13, fontWeight: 600 }}>{conf}</span>
+                  <span style={{ fontSize: 12, color: 'var(--text-2)' }}>{owned}/{total}</span>
+                </div>
+                <div className="ts-bar" style={{ width: '100%' }}>
+                  <div
+                    className={`ts-bar-fill${pct === 100 ? ' done' : ''}`}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
