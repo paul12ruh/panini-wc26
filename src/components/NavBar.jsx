@@ -13,10 +13,10 @@ export default function NavBar({ page, setPage, owned, signOut }) {
 
   return (
     <nav className="navbar">
-      <div className="navbar-brand" onClick={() => setPage('dashboard')}>
+      <button className="navbar-brand" onClick={() => setPage('dashboard')} aria-label="Dashboard">
         <div className="navbar-logo">⚽</div>
-        Panini <span>WC26</span>
-      </div>
+        <span className="navbar-brand-text">Panini <span>WC26</span></span>
+      </button>
 
       <div className="navbar-links">
         {PAGES.map(p => (
@@ -26,7 +26,7 @@ export default function NavBar({ page, setPage, owned, signOut }) {
             onClick={() => setPage(p.id)}
           >
             <span style={{ fontFamily: 'monospace' }}>{p.icon}</span>
-            <span>{p.label}</span>
+            <span className="nav-btn-label">{p.label}</span>
           </button>
         ))}
       </div>
@@ -35,7 +35,7 @@ export default function NavBar({ page, setPage, owned, signOut }) {
         <strong>{pct}%</strong>
         <span>{owned}/{TOTAL}</span>
       </div>
-      <button className="nav-signout" onClick={signOut} title="Sign out">↪</button>
+      <button className="nav-signout" onClick={signOut} title="Sign out" aria-label="Sign out">↪</button>
     </nav>
   )
 }

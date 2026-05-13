@@ -12,6 +12,7 @@ const RARITIES = [
 function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetRarity }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
+  const closeRef = useRef(null)
 
   const owned    = entry.qty > 0
   const rarity   = entry.rarity || 'base'
@@ -23,20 +24,59 @@ function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetRarity }) {
     setOpen(true)
   }
 
+  const closeControls = () => {
+    setOpen(false)
+    requestAnimationFrame(() => ref.current?.focus())
+  }
+
   const handleClick = (e) => {
     e.stopPropagation()
-    onToggle(sticker.id)
+    if (owned) {
+      setOpen(true)
+    } else {
+      onToggle(sticker.id)
+    }
   }
 
   const handleKeyDown = (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return
     e.preventDefault()
-    onToggle(sticker.id)
+    if (owned) {
+      setOpen(true)
+    } else {
+      onToggle(sticker.id)
+    }
   }
 
   useEffect(() => {
     if (!open) return
-    const onKey = (e) => { if (e.key === 'Escape') setOpen(false) }
+    closeRef.current?.focus()
+
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        closeControls()
+        return
+      }
+
+      if (e.key !== 'Tab') return
+      const focusable = Array.from(
+        document.querySelectorAll(
+          '.sticker-controls button:not([disabled]), .sticker-controls [href], .sticker-controls input, .sticker-controls select, .sticker-controls textarea, .sticker-controls [tabindex]:not([tabindex="-1"])'
+        )
+      )
+      if (focusable.length === 0) return
+
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [open])
@@ -54,7 +94,7 @@ function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetRarity }) {
         title={`${sticker.id} — ${sticker.name}`}
       >
         {owned && <div className="sticker-check">✓</div>}
-        {owned && <button className="sticker-edit" onClick={openControls} title="Edit">⋯</button>}
+        {owned && <button className="sticker-edit" onClick={openControls} title="Edit sticker" aria-label={`Edit ${sticker.id}`}>⋯</button>}
         {isDup  && <div className="sticker-qty">×{entry.qty}</div>}
         <div className="sticker-id">{sticker.id}</div>
         <div className="sticker-name">{sticker.name}</div>
@@ -62,14 +102,20 @@ function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetRarity }) {
 
       {open && (
         <>
-          <div className="popover-overlay" onClick={() => setOpen(false)} />
-          <div className="sticker-controls" onClick={e => e.stopPropagation()}>
+          <div className="popover-overlay" onClick={closeControls} />
+          <div
+            className="sticker-controls"
+            onClick={e => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={`controls-title-${sticker.id}`}
+          >
             <div className="controls-header">
               <div>
                 <div className="controls-title">Sticker</div>
-                <div className="controls-sticker-id">{sticker.id} — {sticker.name}</div>
+                <div className="controls-sticker-id" id={`controls-title-${sticker.id}`}>{sticker.id} — {sticker.name}</div>
               </div>
-              <button className="controls-close" onClick={() => setOpen(false)} title="Close">✕</button>
+              <button ref={closeRef} className="controls-close" onClick={closeControls} title="Close" aria-label="Close sticker controls">✕</button>
             </div>
 
             <div>
@@ -94,15 +140,22 @@ function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetRarity }) {
             <div>
               <div className="controls-title" style={{ marginBottom: 8 }}>Quantity</div>
               <div className="qty-row">
-                <button className="qty-btn" onClick={() => onSetQty(sticker.id, entry.qty - 1)}>−</button>
+                <button
+                  className="qty-btn"
+                  onClick={() => onSetQty(sticker.id, entry.qty - 1)}
+                  disabled={entry.qty <= 1}
+                  aria-label={`Decrease ${sticker.id} quantity`}
+                >
+                  −
+                </button>
                 <div className="qty-value">{entry.qty}</div>
-                <button className="qty-btn" onClick={() => onSetQty(sticker.id, entry.qty + 1)}>+</button>
+                <button className="qty-btn" onClick={() => onSetQty(sticker.id, entry.qty + 1)} aria-label={`Increase ${sticker.id} quantity`}>+</button>
               </div>
             </div>
 
             <button
               className="unmark-btn"
-              onClick={() => { onToggle(sticker.id); setOpen(false) }}
+              onClick={() => { onSetQty(sticker.id, 0); closeControls() }}
             >
               ✕ Unmark sticker
             </button>

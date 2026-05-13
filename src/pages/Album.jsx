@@ -8,7 +8,6 @@ export default function Album({ collection, toggle, setQty, setRarity, focusSect
   const [search,      setSearch]      = useState('')
   const [filter,      setFilter]      = useState('All')
   const [expanded,    setExpanded]    = useState({})
-  const [allExpanded, setAllExpanded] = useState(false)
 
   const toggle_section = (id) => setExpanded(p => ({ ...p, [id]: !p[id] }))
 
@@ -29,14 +28,20 @@ export default function Album({ collection, toggle, setQty, setRarity, focusSect
 
   // Expand-all / Collapse-all handler
   const handleToggleAll = () => {
-    if (allExpanded) {
-      setExpanded({})
-    } else {
-      const all = {}
-      filtered.forEach(s => { all[s.id] = true })
-      setExpanded(all)
+    if (allVisibleExpanded) {
+      setExpanded(p => {
+        const next = { ...p }
+        filtered.forEach(s => { delete next[s.id] })
+        return next
+      })
+      return
     }
-    setAllExpanded(p => !p)
+
+    setExpanded(p => {
+      const next = { ...p }
+      filtered.forEach(s => { next[s.id] = true })
+      return next
+    })
   }
 
   const handleSectionKeyDown = (e, id) => {
@@ -61,6 +66,12 @@ export default function Album({ collection, toggle, setQty, setRarity, focusSect
     })
   }, [search, filter])
 
+  const allVisibleExpanded = filtered.length > 0 && filtered.every(s => expanded[s.id])
+  const clearFilters = () => {
+    setSearch('')
+    setFilter('All')
+  }
+
   return (
     <div className="page">
       <div className="page-header">
@@ -82,7 +93,7 @@ export default function Album({ collection, toggle, setQty, setRarity, focusSect
           />
         </div>
         <button className="btn btn-ghost" onClick={handleToggleAll}>
-          {allExpanded ? 'Collapse all' : 'Expand all'}
+          {allVisibleExpanded ? 'Collapse all' : 'Expand all'}
         </button>
         <div className="filter-chips">
           {['All', 'Intro', ...CONFEDERATIONS].map(f => (
@@ -98,6 +109,15 @@ export default function Album({ collection, toggle, setQty, setRarity, focusSect
       </div>
 
       <div className="album-sections">
+        {filtered.length === 0 && (
+          <div className="empty empty-compact glass">
+            <div className="empty-title">No album sections found</div>
+            <div className="empty-sub">
+              No sections match {search ? `"${search}"` : 'the current search'} in {filter === 'All' ? 'all sections' : filter}.
+            </div>
+            <button className="btn btn-primary" onClick={clearFilters}>Clear search</button>
+          </div>
+        )}
         {filtered.map(section => {
           const ownedCount = section.stickers.filter(s => collection[s.id]?.qty > 0).length
           const pct        = Math.round((ownedCount / section.stickers.length) * 100)
