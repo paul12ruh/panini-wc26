@@ -86,23 +86,52 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
                 <button key={key} className={`chip ${heatmapSort===key?'active':''}`} onClick={() => setHeatmapSort(key)}>{label}</button>
               ))}
             </div>
-            <div className="team-comp-grid">
-              {sortedTeamStats.map(ts => (
-                <div
-                  key={ts.id}
-                  className={`team-tile glass ${ts.pct === 100 ? 'complete' : ''}`}
-                  onClick={() => { setFocusSection(ts.id); setPage('album') }}
-                  title={`${ts.name}: ${ts.ownedCount}/${ts.stickers.length}`}
-                >
-                  <div className="team-tile-flag">{ts.flag}</div>
-                  <div className="team-tile-name">{ts.name}</div>
-                  <div className="team-tile-pct">{ts.pct}%</div>
-                  <div className="team-tile-bar">
-                    <div className="team-tile-fill" style={{ width: `${ts.pct}%` }} />
+            {heatmapSort === 'group' ? (
+              ['A','B','C','D','E','F','G','H','I','J','K','L'].map(letter => {
+                const groupTeams = teamStats.filter(ts => ts.group === letter)
+                if (!groupTeams.length) return null
+                return (
+                  <div key={letter} className="group-block">
+                    <div className="group-label">Group {letter}</div>
+                    <div className="team-comp-grid">
+                      {groupTeams.map(ts => (
+                        <div
+                          key={ts.id}
+                          className={`team-tile glass ${ts.pct === 100 ? 'complete' : ''}`}
+                          onClick={() => { setFocusSection(ts.id); setPage('album') }}
+                          title={`${ts.name}: ${ts.ownedCount}/${ts.stickers.length}`}
+                        >
+                          <div className="team-tile-flag">{ts.flag}</div>
+                          <div className="team-tile-name">{ts.name}</div>
+                          <div className="team-tile-pct">{ts.pct}%</div>
+                          <div className="team-tile-bar">
+                            <div className="team-tile-fill" style={{ width: `${ts.pct}%` }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                )
+              })
+            ) : (
+              <div className="team-comp-grid">
+                {sortedTeamStats.map(ts => (
+                  <div
+                    key={ts.id}
+                    className={`team-tile glass ${ts.pct === 100 ? 'complete' : ''}`}
+                    onClick={() => { setFocusSection(ts.id); setPage('album') }}
+                    title={`${ts.name}: ${ts.ownedCount}/${ts.stickers.length}`}
+                  >
+                    <div className="team-tile-flag">{ts.flag}</div>
+                    <div className="team-tile-name">{ts.name}</div>
+                    <div className="team-tile-pct">{ts.pct}%</div>
+                    <div className="team-tile-bar">
+                      <div className="team-tile-fill" style={{ width: `${ts.pct}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
