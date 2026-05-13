@@ -1,43 +1,59 @@
 # Panini WC26 Sticker Tracker
 
-A personal web app for tracking your physical Panini FIFA World Cup 2026 sticker album.
+A personal web app for tracking a physical Panini FIFA World Cup 2026 sticker album.
 
 ## What it is
 
-A browser-only tracker that mirrors the structure of the official Panini FIFA World Cup 2026 sticker album. Mark stickers as you collect them, log duplicates for trading, and keep a running list of what you still need — no account, no server, no internet connection required after the first load.
+This app mirrors the structure of the Panini FIFA World Cup 2026 sticker album. Sign in with Google or an email magic link, mark stickers as collected, track duplicates for trading, tag frame variants, and review what is still missing.
+
+Collection changes are saved locally in the browser and synced to Supabase for signed-in users.
 
 ## Features
 
 ### Dashboard
 - Overall completion percentage with a progress bar
-- Per-team completion heatmap — click any team tile to jump directly to that section in the Album view
-- Rarity breakdown: base stickers, foil stickers, blue-frame parallels, and green-frame parallels
-- Most-complete and needs-attention team lists
+- Section and team completion heatmap
+- Sort completion by group, A-Z, or percent complete
+- Most-complete and needs-attention lists
+- Counts for owned stickers, missing stickers, duplicates, and rare parallels
 
 ### Album
-- Full album view organized by section (introduction pages + all 48 national teams)
-- Search by sticker ID, player name, or team name
-- Filter by confederation (UEFA, CONMEBOL, CONCACAF, CAF, AFC, OFC) or introduction section
-- Expand/collapse team sections individually, or expand/collapse all at once
-- Click a sticker to mark it owned; click again to open the detail popover
+- Full album view organized by introduction sections and national teams
+- Search by sticker ID, player name, section, or team name
+- Filter by confederation or introduction sections
+- Expand/collapse individual sections or all filtered sections
+- Click a sticker to mark it owned
+- Edit owned stickers to adjust quantity and rarity
 
-### Sticker detail popover
-- Quantity controls (increment/decrement) to record duplicates
-- Frame variant selection: Base / Blue / Green
-- One-tap unmark button
+### Sticker controls
+- Quantity controls for duplicates
+- Rarity variants: Base, Blue, Red, Purple, Green, and Black
+- One-tap unmark action
 
 ### Missing list
 - Full list of unowned stickers grouped by section
-- Copy to clipboard (plain text, grouped by team)
-- Export as `missing-stickers.txt`
+- Copy a formatted missing list to the clipboard
+- Export missing stickers as `missing-stickers.txt`
 
 ### Duplicates / trade list
-- All stickers with quantity > 1, grouped by section, showing the extra count
-- Copy to clipboard as a formatted trade list (e.g. `ARG14×2`)
+- All stickers with quantity greater than 1, grouped by section
+- Extra duplicate count per sticker
+- Rarity indicators for non-base duplicates
+- Copy a formatted trade list to the clipboard
 
-### Import / Export
-- Export your collection as a JSON file for backup or sharing
-- Import a previously exported JSON file to restore your collection
+### Stats
+- Foil and parallel rarity breakdown
+- Completion totals by confederation
+
+### Voice input
+- Browser speech-recognition shortcut for marking stickers by saying a team and number, such as "France 7"
+- Duplicate guard with undo toast after marking
+
+### Authentication and sync
+- Google sign-in
+- Email magic-link sign-in
+- Supabase-backed cloud sync through a `collections` table
+- Local `localStorage` persistence under the key `panini-wc2026`
 
 ## Tech stack
 
@@ -45,21 +61,51 @@ A browser-only tracker that mirrors the structure of the official Panini FIFA Wo
 |---|---|
 | UI framework | React 18 |
 | Build tool | Vite 5 |
+| Auth / backend | Supabase |
 | Charts | Recharts |
-| State persistence | `localStorage` (key: `panini-wc2026`) |
-| Backend | None |
+| Local persistence | `localStorage` |
+| Linting | ESLint 9 |
 
 ## Getting started
 
+Install dependencies:
+
 ```bash
 npm install
+```
+
+Create a local environment file:
+
+```bash
+cp .env.example .env
+```
+
+Set the Supabase values in `.env`:
+
+```bash
+VITE_SUPABASE_URL=your-project-url
+VITE_SUPABASE_ANON_KEY=your-anon-key
+```
+
+Start the dev server:
+
+```bash
 npm run dev
 ```
 
 Open [http://localhost:5173](http://localhost:5173) in your browser.
 
+## Available scripts
+
+- `npm run dev` starts the Vite dev server.
+- `npm run build` creates a production build.
+- `npm run lint` runs ESLint.
+- `npm run preview` serves the production build locally.
+
 ## Data persistence
 
-All collection data is stored in your browser's `localStorage`. Nothing is sent to any server. If you clear your browser data or switch browsers, your collection will be lost unless you export it first.
+Collection data is stored locally in the browser and synced to Supabase after sign-in.
 
-**To back up:** use the Export JSON button (available in the nav bar) to download `panini-wc2026-collection.json`. To restore on another browser or device, use the Import JSON button and select that file.
+On first sign-in, the app attempts to load the user's Supabase collection. If no cloud record exists, the current local collection is inserted as the starting cloud record. Later collection changes are debounced and upserted to Supabase.
+
+Clearing browser data can remove the local copy, but a signed-in user can restore from the Supabase record on the next load.
