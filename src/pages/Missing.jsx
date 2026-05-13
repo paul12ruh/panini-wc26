@@ -103,9 +103,6 @@ export default function Missing({ collection }) {
               <div key={s.id} className="missing-row">
                 <span className="missing-id">{s.id}</span>
                 <span className="missing-name">{s.name}</span>
-                <span className={`missing-type ${s.type === 'foil' ? 'foil' : ''}`}>
-                  {s.type === 'foil' ? 'Foil' : 'Base'}
-                </span>
               </div>
             ))}
           </div>
