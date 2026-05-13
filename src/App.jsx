@@ -14,6 +14,7 @@ import AuthGate from './components/AuthGate'
 export default function App() {
   const [page, setPage] = useState('dashboard')
   const [focusSection, setFocusSection] = useState(null)
+  const [heatmapSort, setHeatmapSort] = useState('group')
   const {
     collection, get, toggle,
     setQty, setRarity,
@@ -41,6 +42,8 @@ export default function App() {
           duplicates={duplicates}
           setPage={setPage}
           setFocusSection={setFocusSection}
+          heatmapSort={heatmapSort}
+          setHeatmapSort={setHeatmapSort}
         />
       )}
       {page === 'album'   && (

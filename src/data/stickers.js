@@ -164,6 +164,7 @@ export const SECTIONS = [
     name: team.name,
     flag: team.flag,
     confederation: team.confederation,
+    group: team.group,
     type: 'team',
     stickers: makeTeamStickers(team.code),
   })),

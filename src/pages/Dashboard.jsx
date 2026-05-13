@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { SECTIONS, TOTAL } from '../data/stickers'
 
-export default function Dashboard({ collection, owned, duplicates, setPage, setFocusSection }) {
+export default function Dashboard({ collection, owned, duplicates, setPage, setFocusSection, heatmapSort, setHeatmapSort }) {
   const needed = TOTAL - owned
   const pct    = TOTAL ? ((owned / TOTAL) * 100).toFixed(1) : 0
 
@@ -16,8 +16,6 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
         return { ...s, ownedCount, pct: Math.round((ownedCount / s.stickers.length) * 100) }
       })
   }, [collection])
-
-  const [heatmapSort, setHeatmapSort] = useState('group')
 
   const sortedTeamStats = useMemo(() => {
     if (heatmapSort === 'alpha') return [...teamStats].sort((a, b) => a.name.localeCompare(b.name))
