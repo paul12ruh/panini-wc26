@@ -18,7 +18,6 @@ export default function App() {
   const {
     collection, get, toggle,
     setQty, setRarity,
-    exportJSON, importJSON,
     owned, duplicates, loadCollection,
   } = useCollection()
 

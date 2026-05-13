@@ -14,11 +14,13 @@ Owners:
 
 ## Open
 
+- [ ] [dev] Fix top navigation cropping in smaller browser windows — audit responsive/header layout when the viewport is narrower than full screen and prevent the menu bar from clipping or becoming unusable
 - [ ] [user] Identify the "00" sticker — figure out what the sticker numbered 00 (appears before FWC-1) actually shows on its face, so it can be added to `src/data/stickers.js`
 - [ ] [future] Native iPhone app for voice input — Web Speech API doesn't work on iOS Safari. Separate React Native / Expo project that reads/writes the same Supabase `collections` table via the user's session
 
 ## Done
 
+- [x] 2026-05-13 — Extensive UX/test audit fixes: lint config, keyboard access for clickable tiles/sections, mobile/touch edit controls, clipboard error states, mobile nav sign-out layout, and sync reset on sign-out
 - [x] 2026-05-13 — Google OAuth: create Client ID in Google Cloud Console
 - [x] 2026-05-13 — Google OAuth: enable Google provider in Supabase
 - [x] 2026-05-13 — Verify Vercel env vars match new Supabase project (confirmed via prod bundle inspection)

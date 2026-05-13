@@ -10,7 +10,14 @@ export function useSync(collection, session, loadCollection) {
 
   // On sign-in: load from Supabase, or upload existing localStorage data
   useEffect(() => {
-    if (!session || initialLoadDone.current) return
+    if (!session) {
+      initialLoadDone.current = false
+      isSyncing.current = false
+      clearTimeout(debounceRef.current)
+      return
+    }
+
+    if (initialLoadDone.current) return
 
     const init = async () => {
       isSyncing.current = true
@@ -29,6 +36,9 @@ export function useSync(collection, session, loadCollection) {
         })
       } else if (!error && data?.data) {
         loadCollection(data.data)
+      } else if (error) {
+        // Let local data remain usable if cloud sync is temporarily unavailable.
+        console.error('Unable to load collection from Supabase', error)
       }
       initialLoadDone.current = true
       isSyncing.current = false

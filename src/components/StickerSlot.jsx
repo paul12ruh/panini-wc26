@@ -28,6 +28,12 @@ function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetRarity }) {
     onToggle(sticker.id)
   }
 
+  const handleKeyDown = (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return
+    e.preventDefault()
+    onToggle(sticker.id)
+  }
+
   useEffect(() => {
     if (!open) return
     const onKey = (e) => { if (e.key === 'Escape') setOpen(false) }
@@ -41,6 +47,10 @@ function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetRarity }) {
         ref={ref}
         className={`sticker-slot ${owned ? 'owned' : ''} ${rarityClass}`}
         onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        role="button"
+        tabIndex={0}
+        aria-pressed={owned}
         title={`${sticker.id} — ${sticker.name}`}
       >
         {owned && <div className="sticker-check">✓</div>}
