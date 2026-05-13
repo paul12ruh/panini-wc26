@@ -22,12 +22,12 @@ export default function App() {
     owned, duplicates, loadCollection,
   } = useCollection()
 
-  const { session, loading: authLoading, signIn, signOut } = useAuth()
+  const { session, loading: authLoading, signIn, signInWithGoogle, signOut } = useAuth()
 
   useSync(collection, session, loadCollection)
 
   if (authLoading) return <div className="auth-loading">Loading…</div>
-  if (!session)    return <AuthGate signIn={signIn} />
+  if (!session)    return <AuthGate signIn={signIn} signInWithGoogle={signInWithGoogle} />
 
   const sharedProps = { collection, get, toggle, setQty, setRarity }
 

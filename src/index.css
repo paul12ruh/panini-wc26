@@ -874,6 +874,8 @@ body {
 .auth-input:focus { border-color: var(--primary); }
 .auth-error { color: #ff5c5c; font-size: 13px; text-align: left; }
 .auth-btn { width: 100%; justify-content: center; padding: 13px; font-size: 15px; }
+.auth-google-btn { display: flex; align-items: center; justify-content: center; background: #fff; color: #1f1f1f; border: none; }
+.auth-google-btn:hover { background: #f0f0f0; }
 .auth-loading {
   min-height: 100vh;
   display: flex;
