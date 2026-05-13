@@ -291,6 +291,127 @@ body {
 .section-title { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
 .card { border-radius: var(--radius-lg); padding: 20px; }
 
+/* stats page */
+.stats-layout {
+  max-width: 960px;
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) 1fr;
+  gap: 20px;
+  align-items: start;
+}
+.conf-view {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+.conf-view-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+.conf-view-subtitle {
+  color: var(--text-2);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.conf-summary {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.conf-summary > div {
+  min-width: 120px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 10px;
+  background: var(--surface);
+}
+.conf-summary span {
+  display: block;
+  color: var(--text-3);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.conf-summary strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 13px;
+}
+.conf-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.conf-card {
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+.conf-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+.conf-name {
+  font-size: 16px;
+  font-weight: 800;
+}
+.conf-meta {
+  margin-top: 2px;
+  color: var(--text-2);
+  font-size: 12px;
+}
+.conf-pct {
+  color: var(--text-3);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+}
+.conf-pct.done { color: var(--primary); }
+.conf-bar {
+  width: 100%;
+  margin-bottom: 12px;
+}
+.conf-team-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.conf-team-row {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto auto;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+}
+.conf-team-flag {
+  font-size: 16px;
+  line-height: 1;
+}
+.conf-team-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.conf-team-group,
+.conf-team-count {
+  color: var(--text-2);
+  font-size: 11px;
+  white-space: nowrap;
+}
+.conf-team-count {
+  color: var(--text);
+  font-weight: 700;
+  text-align: right;
+}
+
 /* team completion grid */
 .team-comp-grid {
   display: grid;
@@ -1017,6 +1138,7 @@ body {
   .navbar { padding: 0 16px; gap: 10px; }
   .nav-btn { padding: 7px 10px; font-size: 13px; }
   .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .stats-layout { grid-template-columns: 1fr; max-width: 680px; }
   .dashboard-grid { grid-template-columns: 1fr; }
   .hero { padding: 24px; }
   .hero-title { font-size: 36px; }
@@ -1164,6 +1286,10 @@ body {
 
   /* Misc tweaks */
   .stats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .conf-view-header { flex-direction: column; }
+  .conf-summary { justify-content: flex-start; width: 100%; }
+  .conf-summary > div { flex: 1; }
+  .conf-grid { grid-template-columns: 1fr; }
   .sticker-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
 
 }

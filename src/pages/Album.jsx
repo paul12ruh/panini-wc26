@@ -1,8 +1,9 @@
 import { useState, useMemo, useEffect } from 'react'
-import { SECTIONS, CONFEDERATIONS } from '../data/stickers'
+import { SECTIONS, GROUPS } from '../data/stickers'
 import StickerSlot from '../components/StickerSlot'
 
 const DEFAULT_ENTRY = { qty: 0, rarity: 'base' }
+const FILTERS = ['All', 'Intro', ...GROUPS.map(group => `Group ${group}`)]
 
 export default function Album({ collection, toggle, setQty, setRarity, focusSection, setFocusSection, setPage }) {
   const [search,      setSearch]      = useState('')
@@ -55,7 +56,7 @@ export default function Album({ collection, toggle, setQty, setRarity, focusSect
     return SECTIONS.filter(s => {
       if (filter !== 'All') {
         if (filter === 'Intro' && s.type !== 'intro') return false
-        if (filter !== 'Intro' && s.confederation !== filter) return false
+        if (filter !== 'Intro' && s.group !== filter.replace('Group ', '')) return false
       }
       if (!q) return true
       if (s.name.toLowerCase().includes(q)) return true
@@ -96,7 +97,7 @@ export default function Album({ collection, toggle, setQty, setRarity, focusSect
           {allVisibleExpanded ? 'Collapse all' : 'Expand all'}
         </button>
         <div className="filter-chips">
-          {['All', 'Intro', ...CONFEDERATIONS].map(f => (
+          {FILTERS.map(f => (
             <button
               key={f}
               className={`chip ${filter === f ? 'active' : ''}`}

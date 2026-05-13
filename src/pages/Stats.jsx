@@ -30,9 +30,31 @@ export default function Stats({ collection }) {
         0
       )
       const pct = total ? Math.round((owned / total) * 100) : 0
-      return { conf, owned, total, pct }
+      const teams = sections.map(section => {
+        const teamOwned = section.stickers.filter(st => collection[st.id]?.qty > 0).length
+        const teamTotal = section.stickers.length
+        const teamPct = teamTotal ? Math.round((teamOwned / teamTotal) * 100) : 0
+        return {
+          id: section.id,
+          name: section.name,
+          flag: section.flag,
+          group: section.group,
+          owned: teamOwned,
+          total: teamTotal,
+          pct: teamPct,
+        }
+      })
+      return { conf, owned, total, pct, teams }
     })
   }, [collection])
+
+  const confSummary = useMemo(() => {
+    const owned = confStats.reduce((sum, item) => sum + item.owned, 0)
+    const total = confStats.reduce((sum, item) => sum + item.total, 0)
+    const best = confStats.reduce((leader, item) => (item.pct > leader.pct ? item : leader), confStats[0])
+    const needsWork = confStats.reduce((lowest, item) => (item.pct < lowest.pct ? item : lowest), confStats[0])
+    return { owned, total, best, needsWork }
+  }, [confStats])
 
   const hasAnyParallels = Object.entries(rarityStats)
     .filter(([k]) => k !== 'foilOwned')
@@ -44,7 +66,7 @@ export default function Stats({ collection }) {
         <div className="page-title">Stats</div>
       </div>
 
-      <div style={{ maxWidth: 600, display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div className="stats-layout">
         {/* Rarity Breakdown */}
         <div className="card glass">
           <div className="section-title">Rarity Breakdown</div>
@@ -69,23 +91,55 @@ export default function Stats({ collection }) {
           )}
         </div>
 
-        {/* By Confederation */}
-        <div className="card glass">
-          <div className="section-title">By Confederation</div>
-          {confStats.map(({ conf, owned, total, pct }) => (
-            <div key={conf} style={{ marginBottom: 12 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
-                <span style={{ fontSize: 13, fontWeight: 600 }}>{conf}</span>
-                <span style={{ fontSize: 12, color: 'var(--text-2)' }}>{owned}/{total}</span>
-              </div>
-              <div className="ts-bar" style={{ width: '100%' }}>
-                <div
-                  className={`ts-bar-fill${pct === 100 ? ' done' : ''}`}
-                  style={{ width: `${pct}%` }}
-                />
+        <div className="conf-view">
+          <div className="conf-view-header">
+            <div>
+              <div className="section-title">Confederation View</div>
+              <div className="conf-view-subtitle">
+                {confSummary.owned}/{confSummary.total} team stickers owned across all confederations.
               </div>
             </div>
-          ))}
+            <div className="conf-summary">
+              <div>
+                <span>Strongest</span>
+                <strong>{confSummary.best.conf} · {confSummary.best.pct}%</strong>
+              </div>
+              <div>
+                <span>Needs focus</span>
+                <strong>{confSummary.needsWork.conf} · {confSummary.needsWork.pct}%</strong>
+              </div>
+            </div>
+          </div>
+
+          <div className="conf-grid">
+            {confStats.map(({ conf, owned, total, pct, teams }) => (
+              <div key={conf} className="conf-card glass">
+                <div className="conf-card-top">
+                  <div>
+                    <div className="conf-name">{conf}</div>
+                    <div className="conf-meta">{teams.length} teams · {owned}/{total} owned</div>
+                  </div>
+                  <div className={`conf-pct ${pct === 100 ? 'done' : ''}`}>{pct}%</div>
+                </div>
+                <div className="ts-bar conf-bar">
+                  <div
+                    className={`ts-bar-fill${pct === 100 ? ' done' : ''}`}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+                <div className="conf-team-list">
+                  {teams.map(team => (
+                    <div key={team.id} className="conf-team-row">
+                      <span className="conf-team-flag">{team.flag}</span>
+                      <span className="conf-team-name">{team.name}</span>
+                      <span className="conf-team-group">Group {team.group}</span>
+                      <span className="conf-team-count">{team.owned}/{team.total}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
