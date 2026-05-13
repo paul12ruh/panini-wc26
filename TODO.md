@@ -14,11 +14,20 @@ Owners:
 
 ## Open
 
-- [ ] [user] Identify the "00" sticker — figure out what the sticker numbered 00 (appears before FWC-1) actually shows on its face, so it can be added to `src/data/stickers.js`
+- [ ] [dev] Add cool feature ideas backlog — brainstorm and prioritize higher-delight tracker features that fit the app, then break the best ones into buildable TODOs
+- [ ] [dev] Redesign Missing tab list layout — replace uneven chips with a cleaner, consistently sized/scannable missing-sticker view
+- [ ] [dev] Change Album filters from confederations to groups — show Group A through Group L filters instead of UEFA/CONMEBOL/CONCACAF/etc.
+- [ ] [dev] Add confederation view to Stats — move confederation-focused analysis into Stats as a richer dedicated view
+- [ ] [dev] Remove emoji icons from dashboard stat cards — use cleaner text/icon styling for owned, needed, duplicates, and rare parallels
+- [ ] [dev] Add dashboard ranking for most duplicated stickers — show a ranked table/list of cards with the highest duplicate counts
+- [ ] [dev] Extend voice input to recognize sticker/player names — allow marking by athlete/sticker name, not only team plus number
+- [ ] [dev] Add voice input instructions and color parsing — document accepted phrases and support colors/rarities such as blue/red/purple/green/black
+- [ ] [dev] Review phone web UX — smoke-test mobile layout, clarify current limitations, and identify improvements beyond the future native app
 - [ ] [future] Native iPhone app for voice input — Web Speech API doesn't work on iOS Safari. Separate React Native / Expo project that reads/writes the same Supabase `collections` table via the user's session
 
 ## Done
 
+- [x] 2026-05-13 — Add normal sticker 00 before FWC-1
 - [x] 2026-05-13 — Improve sync error visibility and conflict handling
 - [x] 2026-05-13 — Harden collection data validation for local cache, imports, and cloud payloads
 - [x] 2026-05-13 — Tighten voice input parsing to avoid short team alias substring matches

@@ -85,7 +85,10 @@ Set the Supabase values in `.env`:
 ```bash
 VITE_SUPABASE_URL=your-project-url
 VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_ENABLE_DEV_AUTH=false
 ```
+
+For local authenticated UI smoke testing without a real Supabase session, set `VITE_ENABLE_DEV_AUTH=true` in `.env` and restart `npm run dev`. This is dev-only, uses local cache only, and does not sync the mock user to Supabase.
 
 Start the dev server:
 
