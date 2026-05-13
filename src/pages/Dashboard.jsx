@@ -7,21 +7,21 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
 
   const totalParallels = Object.values(collection).filter(e => e.qty > 0 && e.rarity && e.rarity !== 'base').length
 
-  // Album order — no sort, matches physical SECTIONS order
-  const teamStats = useMemo(() => {
-    return SECTIONS
-      .filter(s => s.type === 'team')
-      .map(s => {
-        const ownedCount = s.stickers.filter(st => collection[st.id]?.qty > 0).length
-        return { ...s, ownedCount, pct: Math.round((ownedCount / s.stickers.length) * 100) }
-      })
+  const allStats = useMemo(() => {
+    return SECTIONS.map(s => {
+      const ownedCount = s.stickers.filter(st => collection[st.id]?.qty > 0).length
+      return { ...s, ownedCount, pct: Math.round((ownedCount / s.stickers.length) * 100) }
+    })
   }, [collection])
 
-  const sortedTeamStats = useMemo(() => {
-    if (heatmapSort === 'alpha') return [...teamStats].sort((a, b) => a.name.localeCompare(b.name))
-    if (heatmapSort === 'pct')   return [...teamStats].sort((a, b) => b.pct - a.pct || a.name.localeCompare(b.name))
-    return teamStats // 'group': natural SECTIONS order
-  }, [teamStats, heatmapSort])
+  const teamStats  = useMemo(() => allStats.filter(s => s.type === 'team'),  [allStats])
+  const introStats = useMemo(() => allStats.filter(s => s.type === 'intro'), [allStats])
+
+  const sortedAllStats = useMemo(() => {
+    if (heatmapSort === 'alpha') return [...allStats].sort((a, b) => a.name.localeCompare(b.name))
+    if (heatmapSort === 'pct')   return [...allStats].sort((a, b) => b.pct - a.pct || a.name.localeCompare(b.name))
+    return allStats
+  }, [allStats, heatmapSort])
 
   // Side-panel rankings remain sorted by completion %
   const topTeams    = [...teamStats].sort((a, b) => b.pct - a.pct).slice(0, 5)
@@ -84,52 +84,48 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
                 <button key={key} className={`chip ${heatmapSort===key?'active':''}`} onClick={() => setHeatmapSort(key)}>{label}</button>
               ))}
             </div>
-            {heatmapSort === 'group' ? (
-              ['A','B','C','D','E','F','G','H','I','J','K','L'].map(letter => {
-                const groupTeams = teamStats.filter(ts => ts.group === letter)
-                if (!groupTeams.length) return null
-                return (
-                  <div key={letter} className="group-block">
-                    <div className="group-label">Group {letter}</div>
-                    <div className="team-comp-grid">
-                      {groupTeams.map(ts => (
-                        <div
-                          key={ts.id}
-                          className={`team-tile glass ${ts.pct === 100 ? 'complete' : ''}`}
-                          onClick={() => { setFocusSection(ts.id); setPage('album') }}
-                          title={`${ts.name}: ${ts.ownedCount}/${ts.stickers.length}`}
-                        >
-                          <div className="team-tile-flag">{ts.flag}</div>
-                          <div className="team-tile-name">{ts.name}</div>
-                          <div className="team-tile-pct">{ts.pct}%</div>
-                          <div className="team-tile-bar">
-                            <div className="team-tile-fill" style={{ width: `${ts.pct}%` }} />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+            {(() => {
+              const renderTile = (ts) => (
+                <div
+                  key={ts.id}
+                  className={`team-tile glass ${ts.pct === 100 ? 'complete' : ''}`}
+                  onClick={() => { setFocusSection(ts.id); setPage('album') }}
+                  title={`${ts.name}: ${ts.ownedCount}/${ts.stickers.length}`}
+                >
+                  <div className="team-tile-flag">{ts.flag || '🏆'}</div>
+                  <div className="team-tile-name">{ts.name}</div>
+                  <div className="team-tile-pct">{ts.pct}%</div>
+                  <div className="team-tile-bar">
+                    <div className="team-tile-fill" style={{ width: `${ts.pct}%` }} />
                   </div>
-                )
-              })
-            ) : (
-              <div className="team-comp-grid">
-                {sortedTeamStats.map(ts => (
-                  <div
-                    key={ts.id}
-                    className={`team-tile glass ${ts.pct === 100 ? 'complete' : ''}`}
-                    onClick={() => { setFocusSection(ts.id); setPage('album') }}
-                    title={`${ts.name}: ${ts.ownedCount}/${ts.stickers.length}`}
-                  >
-                    <div className="team-tile-flag">{ts.flag}</div>
-                    <div className="team-tile-name">{ts.name}</div>
-                    <div className="team-tile-pct">{ts.pct}%</div>
-                    <div className="team-tile-bar">
-                      <div className="team-tile-fill" style={{ width: `${ts.pct}%` }} />
+                </div>
+              )
+
+              if (heatmapSort !== 'group') {
+                return <div className="team-comp-grid">{sortedAllStats.map(renderTile)}</div>
+              }
+
+              return (
+                <>
+                  {introStats.length > 0 && (
+                    <div className="group-block">
+                      <div className="group-label">Special</div>
+                      <div className="team-comp-grid">{introStats.map(renderTile)}</div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                  )}
+                  {['A','B','C','D','E','F','G','H','I','J','K','L'].map(letter => {
+                    const groupTeams = teamStats.filter(ts => ts.group === letter)
+                    if (!groupTeams.length) return null
+                    return (
+                      <div key={letter} className="group-block">
+                        <div className="group-label">Group {letter}</div>
+                        <div className="team-comp-grid">{groupTeams.map(renderTile)}</div>
+                      </div>
+                    )
+                  })}
+                </>
+              )
+            })()}
           </div>
         </div>
 
