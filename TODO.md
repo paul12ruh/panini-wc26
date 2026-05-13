@@ -20,6 +20,7 @@ Owners:
 
 ## Done
 
+- [x] 2026-05-13 — Make duplicate voice confirmations clickable without unsafe undo behavior
 - [x] 2026-05-13 — Make voice confirmation toast navigate to the updated sticker
 - [x] 2026-05-13 — Color duplicate chips by duplicated sticker variant
 - [x] 2026-05-13 — Show exact unmatched entries after pack opening import

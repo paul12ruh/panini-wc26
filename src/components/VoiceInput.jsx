@@ -257,7 +257,7 @@ function parseTranscript(raw) {
 export default function VoiceInput({ collection, onMark, onSetRarity, onToastNavigate }) {
   const [supported, setSupported] = useState(false)
   const [listening, setListening] = useState(false)
-  const [toast, setToast] = useState(null) // { message, stickerId } | null
+  const [toast, setToast] = useState(null) // { message, stickerId, undoable } | null
   const recognitionRef = useRef(null)
   const toastTimerRef = useRef(null)
 
@@ -271,9 +271,9 @@ export default function VoiceInput({ collection, onMark, onSetRarity, onToastNav
     setToast(null)
   }
 
-  const showToast = (message, stickerId = null) => {
+  const showToast = (message, stickerId = null, options = {}) => {
     clearTimeout(toastTimerRef.current)
-    setToast({ message, stickerId })
+    setToast({ message, stickerId, undoable: Boolean(options.undoable) })
     toastTimerRef.current = setTimeout(() => setToast(null), 3000)
   }
 
@@ -322,9 +322,9 @@ export default function VoiceInput({ collection, onMark, onSetRarity, onToastNav
       if (isOwned) {
         if (onSetRarity) {
           onSetRarity(stickerId, rarity)
-          showToast(`Added ${rarityLabel} ${stickerId}`)
+          showToast(`Added ${rarityLabel} ${stickerId}`, stickerId)
         } else {
-          showToast(`${stickerId} already marked`)
+          showToast(`${stickerId} already marked`, stickerId)
         }
       } else {
         if (rarity === 'base' || !onSetRarity) {
@@ -333,7 +333,7 @@ export default function VoiceInput({ collection, onMark, onSetRarity, onToastNav
           onSetRarity(stickerId, rarity)
         }
         const rarityText = rarity === 'base' ? '' : ` ${rarityLabel}`
-        showToast(`Marked${rarityText} ${stickerId} — ${sticker.name} ✓`, stickerId)
+        showToast(`Marked${rarityText} ${stickerId} — ${sticker.name} ✓`, stickerId, { undoable: true })
       }
     }
 
@@ -397,7 +397,7 @@ export default function VoiceInput({ collection, onMark, onSetRarity, onToastNav
           {toast.stickerId && (
             <span className="voice-toast-hint">View</span>
           )}
-          {toast.stickerId && (
+          {toast.undoable && (
             <span
               className="undo-btn"
               role="button"
