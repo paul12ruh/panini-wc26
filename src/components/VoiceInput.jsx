@@ -1,8 +1,24 @@
 import { useEffect, useRef, useState } from 'react'
-import { ALL_STICKERS } from '../data/stickers'
+import { ALL_STICKERS, TEAMS } from '../data/stickers'
 
 // Build a flat lookup: stickerId -> sticker object
 const STICKER_MAP = Object.fromEntries(ALL_STICKERS.map(s => [s.id, s]))
+const TEAM_BY_CODE = Object.fromEntries(TEAMS.map(team => [team.code, team]))
+
+const RARITIES = new Set(['base', 'blue', 'red', 'purple', 'green', 'black'])
+const RARITY_LABELS = {
+  base: 'Base',
+  blue: 'Blue',
+  red: 'Red',
+  purple: 'Purple',
+  green: 'Green',
+  black: 'Black',
+}
+const RARITY_ALIASES = {
+  normal: 'base',
+  regular: 'base',
+  standard: 'base',
+}
 
 // Spoken word numbers -> integer
 const WORD_NUMBERS = {
@@ -122,8 +138,85 @@ const TEAM_KEY_MATCHERS = TEAM_KEYS_SORTED.map(key => [
   new RegExp(`(^|[^\\p{L}\\p{N}])${escapeRegExp(key).replace(/\s+/g, '\\s+')}(?=$|[^\\p{L}\\p{N}])`, 'u'),
 ])
 
+const normalizeForVoice = value => value
+  .toLowerCase()
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .replace(/['’]/g, '')
+  .replace(/[^a-z0-9]+/g, ' ')
+  .trim()
+  .replace(/\s+/g, ' ')
+
+const getStickerTeamCode = sticker => {
+  const match = sticker.id.match(/^([A-Z]{3})-\d+$/)
+  return match ? match[1] : null
+}
+
+const addAlias = (aliases, alias, stickerId) => {
+  const normalized = normalizeForVoice(alias)
+  if (!normalized) return
+  aliases.set(normalized, [...(aliases.get(normalized) || []), stickerId])
+}
+
+const buildStickerNameAliases = () => {
+  const aliases = new Map()
+  const potentialShortAliases = new Map()
+
+  for (const sticker of ALL_STICKERS) {
+    addAlias(aliases, sticker.name, sticker.id)
+
+    const teamCode = getStickerTeamCode(sticker)
+    const team = teamCode ? TEAM_BY_CODE[teamCode] : null
+    if (team) {
+      addAlias(aliases, `${team.name} ${sticker.name}`, sticker.id)
+      addAlias(aliases, `${sticker.name} ${team.name}`, sticker.id)
+      addAlias(aliases, `${team.code} ${sticker.name}`, sticker.id)
+      addAlias(aliases, `${sticker.name} ${team.code}`, sticker.id)
+    }
+
+    const words = normalizeForVoice(sticker.name).split(' ').filter(Boolean)
+    if (words.length > 1 && sticker.name !== 'Team Badge' && sticker.name !== 'Team Photo') {
+      const lastWord = words[words.length - 1]
+      potentialShortAliases.set(lastWord, [...(potentialShortAliases.get(lastWord) || []), sticker.id])
+    }
+  }
+
+  for (const [alias, stickerIds] of potentialShortAliases) {
+    if (stickerIds.length === 1) aliases.set(alias, stickerIds)
+  }
+
+  return [...aliases.entries()]
+    .filter(([, stickerIds]) => stickerIds.length === 1)
+    .map(([alias, [stickerId]]) => [alias, stickerId])
+    .sort((a, b) => b[0].length - a[0].length)
+}
+
+const STICKER_NAME_ALIASES = buildStickerNameAliases()
+
+const hasPhrase = (text, phrase) => {
+  const matcher = new RegExp(`(^|\\s)${escapeRegExp(phrase).replace(/\s+/g, '\\s+')}(?=$|\\s)`)
+  return matcher.test(text)
+}
+
+function parseRarity(text) {
+  for (const word of text.split(/\s+/)) {
+    if (RARITIES.has(word)) return word
+    if (RARITY_ALIASES[word]) return RARITY_ALIASES[word]
+  }
+  return 'base'
+}
+
+function findStickerByName(normalizedText) {
+  for (const [alias, stickerId] of STICKER_NAME_ALIASES) {
+    if (hasPhrase(normalizedText, alias)) return STICKER_MAP[stickerId]
+  }
+  return null
+}
+
 function parseTranscript(raw) {
   const text = raw.toLowerCase().trim()
+  const normalizedText = normalizeForVoice(raw)
+  const rarity = parseRarity(normalizedText)
 
   // --- extract number ---
   let number = null
@@ -144,8 +237,6 @@ function parseTranscript(raw) {
     if (digitMatch) number = parseInt(digitMatch[1], 10)
   }
 
-  if (number === null) return null
-
   // --- extract team code ---
   let teamCode = null
   for (const [key, matcher] of TEAM_KEY_MATCHERS) {
@@ -155,12 +246,15 @@ function parseTranscript(raw) {
     }
   }
 
-  if (!teamCode) return null
+  if (number !== null && teamCode) return { stickerId: `${teamCode}-${number}`, rarity }
 
-  return { teamCode, number }
+  const sticker = findStickerByName(normalizedText)
+  if (sticker) return { stickerId: sticker.id, rarity }
+
+  return null
 }
 
-export default function VoiceInput({ collection, onMark }) {
+export default function VoiceInput({ collection, onMark, onSetRarity }) {
   const [supported, setSupported] = useState(false)
   const [listening, setListening] = useState(false)
   const [toast, setToast] = useState(null) // { message, stickerId } | null
@@ -181,6 +275,10 @@ export default function VoiceInput({ collection, onMark }) {
     clearTimeout(toastTimerRef.current)
     setToast({ message, stickerId })
     toastTimerRef.current = setTimeout(() => setToast(null), 3000)
+  }
+
+  const showTryAgainToast = () => {
+    showToast("Didn't catch that — try 'France 7', 'Messi', or 'blue Mbappe'")
   }
 
   const handleMicClick = () => {
@@ -206,26 +304,34 @@ export default function VoiceInput({ collection, onMark }) {
       const parsed = parseTranscript(transcript)
 
       if (!parsed) {
-        showToast("Didn't catch that — try saying 'France 7'")
+        showTryAgainToast()
         return
       }
 
-      const { teamCode, number } = parsed
-      const stickerId = `${teamCode}-${number}`
+      const { stickerId, rarity } = parsed
       const sticker = STICKER_MAP[stickerId]
 
       if (!sticker) {
-        showToast("Didn't catch that — try saying 'France 7'")
+        showTryAgainToast()
         return
       }
 
       const isOwned = collection[stickerId]?.qty > 0
+      const currentRarity = collection[stickerId]?.rarity || 'base'
+      const rarityLabel = RARITY_LABELS[rarity]
 
       if (isOwned) {
-        showToast(`${stickerId} already marked`)
+        if (rarity !== currentRarity && onSetRarity) {
+          onSetRarity(stickerId, rarity)
+          showToast(`Updated ${stickerId} to ${rarityLabel}`)
+        } else {
+          showToast(`${stickerId} already marked`)
+        }
       } else {
         onMark(stickerId)
-        showToast(`Marked ${stickerId} — ${sticker.name} ✓`, stickerId)
+        if (rarity !== 'base' && onSetRarity) onSetRarity(stickerId, rarity)
+        const rarityText = rarity === 'base' ? '' : ` ${rarityLabel}`
+        showToast(`Marked${rarityText} ${stickerId} — ${sticker.name} ✓`, stickerId)
       }
     }
 
@@ -256,11 +362,15 @@ export default function VoiceInput({ collection, onMark }) {
       <button
         className={`voice-fab${listening ? ' listening' : ''}`}
         onClick={handleMicClick}
-        aria-label={listening ? 'Stop listening' : 'Voice input — say team and number'}
-        title={listening ? 'Listening… click to stop' : "Say e.g. 'France 7'"}
+        aria-label={listening ? 'Stop listening' : 'Voice input — say a team and number, sticker name, player name, or color'}
+        title={listening ? 'Listening… click to stop' : "Say 'France 7', 'Messi', or 'blue Mbappe'"}
       >
         {listening ? '⏹' : '🎤'}
       </button>
+
+      <div className="voice-help" aria-label="Voice input examples">
+        Say <strong>France 7</strong>, <strong>Messi</strong>, or <strong>blue Mbappe</strong>
+      </div>
 
       {toast && (
         <div className="voice-toast" role="status">

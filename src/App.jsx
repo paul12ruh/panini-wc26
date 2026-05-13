@@ -64,7 +64,7 @@ export default function App() {
       {page === 'dupes'   && <Duplicates collection={collection} />}
       {page === 'stats'   && <Stats collection={collection} />}
 
-      <VoiceInput collection={collection} onMark={toggle} />
+      <VoiceInput collection={collection} onMark={toggle} onSetRarity={setRarity} />
     </>
   )
 }
