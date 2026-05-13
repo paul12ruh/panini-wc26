@@ -11,10 +11,16 @@ import { useCollection } from './hooks/useCollection'
 import { useAuth } from './hooks/useAuth'
 import { useSync } from './hooks/useSync'
 import AuthGate from './components/AuthGate'
+import { SECTIONS } from './data/stickers'
+
+const findStickerSectionId = (stickerId) => (
+  SECTIONS.find(section => section.stickers.some(sticker => sticker.id === stickerId))?.id || null
+)
 
 export default function App() {
   const [page, setPage] = useState('dashboard')
   const [focusSection, setFocusSection] = useState(null)
+  const [focusSticker, setFocusSticker] = useState(null)
   const [heatmapSort, setHeatmapSort] = useState('group')
   const {
     collection, get, toggle,
@@ -31,6 +37,13 @@ export default function App() {
   if (!session)    return <AuthGate signIn={signIn} signInWithGoogle={signInWithGoogle} />
 
   const sharedProps = { collection, get, toggle, setQty, setRarity, setVariantQty }
+  const openStickerInAlbum = (stickerId) => {
+    const sectionId = findStickerSectionId(stickerId)
+    if (!sectionId) return
+    setFocusSection(sectionId)
+    setFocusSticker(stickerId)
+    setPage('album')
+  }
 
   return (
     <>
@@ -61,6 +74,8 @@ export default function App() {
           {...sharedProps}
           focusSection={focusSection}
           setFocusSection={setFocusSection}
+          focusSticker={focusSticker}
+          setFocusSticker={setFocusSticker}
           setPage={setPage}
         />
       )}
@@ -78,7 +93,12 @@ export default function App() {
         />
       )}
 
-      <VoiceInput collection={collection} onMark={toggle} onSetRarity={setRarity} />
+      <VoiceInput
+        collection={collection}
+        onMark={toggle}
+        onSetRarity={setRarity}
+        onToastNavigate={openStickerInAlbum}
+      />
     </>
   )
 }

@@ -12,7 +12,7 @@ const RARITIES = [
 
 const EMPTY_VARIANTS = { base: 0, blue: 0, red: 0, purple: 0, green: 0, black: 0 }
 
-function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetRarity, onSetVariantQty }) {
+function StickerSlot({ sticker, entry, highlighted, onToggle, onSetQty, onSetRarity, onSetVariantQty }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
   const closeRef = useRef(null)
@@ -164,8 +164,9 @@ function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetRarity, onSetVar
   return (
     <>
       <div
+        id={`sticker-${sticker.id}`}
         ref={ref}
-        className={`sticker-slot ${owned ? 'owned' : ''} ${rarityClass}`}
+        className={`sticker-slot ${owned ? 'owned' : ''} ${rarityClass} ${highlighted ? 'highlighted' : ''}`}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         role="button"

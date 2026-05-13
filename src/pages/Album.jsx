@@ -9,10 +9,22 @@ const DEFAULT_ENTRY = {
 }
 const FILTERS = ['All', 'Intro', ...GROUPS.map(group => `Group ${group}`)]
 
-export default function Album({ collection, toggle, setQty, setRarity, setVariantQty, focusSection, setFocusSection, setPage }) {
+export default function Album({
+  collection,
+  toggle,
+  setQty,
+  setRarity,
+  setVariantQty,
+  focusSection,
+  setFocusSection,
+  focusSticker,
+  setFocusSticker,
+  setPage,
+}) {
   const [search,      setSearch]      = useState('')
   const [filter,      setFilter]      = useState('All')
   const [expanded,    setExpanded]    = useState({})
+  const [highlightSticker, setHighlightSticker] = useState(null)
 
   const toggle_section = (id) => setExpanded(p => ({ ...p, [id]: !p[id] }))
 
@@ -21,15 +33,23 @@ export default function Album({ collection, toggle, setQty, setRarity, setVarian
     if (!focusSection) return
     const match = SECTIONS.find(s => s.id === focusSection)
     if (!match) { setFocusSection(null); return }
+    setSearch('')
+    setFilter('All')
     setExpanded(p => ({ ...p, [focusSection]: true }))
     // Use a small timeout to let the DOM update before scrolling
     const timer = setTimeout(() => {
-      const el = document.getElementById(`section-${focusSection}`)
+      const el = document.getElementById(focusSticker ? `sticker-${focusSticker}` : `section-${focusSection}`)
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      if (focusSticker) {
+        el?.focus({ preventScroll: true })
+        setHighlightSticker(focusSticker)
+        setTimeout(() => setHighlightSticker(null), 2200)
+        setFocusSticker(null)
+      }
       setFocusSection(null)
     }, 80)
     return () => clearTimeout(timer)
-  }, [focusSection, setFocusSection])
+  }, [focusSection, focusSticker, setFocusSection, setFocusSticker])
 
   // Expand-all / Collapse-all handler
   const handleToggleAll = () => {
@@ -162,6 +182,7 @@ export default function Album({ collection, toggle, setQty, setRarity, setVarian
                       key={sticker.id}
                       sticker={sticker}
                       entry={collection[sticker.id] ?? DEFAULT_ENTRY}
+                      highlighted={highlightSticker === sticker.id}
                       onToggle={toggle}
                       onSetQty={setQty}
                       onSetRarity={setRarity}

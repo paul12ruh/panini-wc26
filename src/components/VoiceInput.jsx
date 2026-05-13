@@ -254,7 +254,7 @@ function parseTranscript(raw) {
   return null
 }
 
-export default function VoiceInput({ collection, onMark, onSetRarity }) {
+export default function VoiceInput({ collection, onMark, onSetRarity, onToastNavigate }) {
   const [supported, setSupported] = useState(false)
   const [listening, setListening] = useState(false)
   const [toast, setToast] = useState(null) // { message, stickerId } | null
@@ -357,6 +357,12 @@ export default function VoiceInput({ collection, onMark, onSetRarity }) {
     dismissToast()
   }
 
+  const handleToastClick = () => {
+    if (!toast?.stickerId || !onToastNavigate) return
+    dismissToast()
+    onToastNavigate(toast.stickerId)
+  }
+
   if (!supported) return null
 
   return (
@@ -375,12 +381,40 @@ export default function VoiceInput({ collection, onMark, onSetRarity }) {
       </div>
 
       {toast && (
-        <div className="voice-toast" role="status">
+        <div
+          className={`voice-toast ${toast.stickerId ? 'clickable' : ''}`}
+          role={toast.stickerId ? 'button' : 'status'}
+          tabIndex={toast.stickerId ? 0 : undefined}
+          onClick={handleToastClick}
+          onKeyDown={(e) => {
+            if (!toast.stickerId || (e.key !== 'Enter' && e.key !== ' ')) return
+            e.preventDefault()
+            handleToastClick()
+          }}
+          aria-label={toast.stickerId ? `${toast.message}. Open sticker in album.` : toast.message}
+        >
           <span className="voice-toast-msg">{toast.message}</span>
           {toast.stickerId && (
-            <button className="undo-btn" onClick={handleUndo}>
+            <span className="voice-toast-hint">View</span>
+          )}
+          {toast.stickerId && (
+            <span
+              className="undo-btn"
+              role="button"
+              tabIndex={0}
+              onClick={(e) => {
+                e.stopPropagation()
+                handleUndo()
+              }}
+              onKeyDown={(e) => {
+                if (e.key !== 'Enter' && e.key !== ' ') return
+                e.preventDefault()
+                e.stopPropagation()
+                handleUndo()
+              }}
+            >
               Undo
-            </button>
+            </span>
           )}
         </div>
       )}
