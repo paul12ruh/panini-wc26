@@ -26,6 +26,21 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
   // Side-panel rankings remain sorted by completion %
   const topTeams    = [...teamStats].sort((a, b) => b.pct - a.pct).slice(0, 5)
   const bottomTeams = [...teamStats].sort((a, b) => a.pct - b.pct).slice(0, 3)
+  const mostDuplicated = useMemo(() => {
+    return SECTIONS.flatMap(section =>
+      section.stickers
+        .map(sticker => ({
+          ...sticker,
+          sectionId: section.id,
+          sectionName: section.name,
+          flag: section.flag,
+          extra: Math.max(0, (collection[sticker.id]?.qty || 0) - 1),
+        }))
+        .filter(sticker => sticker.extra > 0)
+    )
+      .sort((a, b) => b.extra - a.extra || a.id.localeCompare(b.id))
+      .slice(0, 5)
+  }, [collection])
   const openSection = (id) => {
     setFocusSection(id)
     setPage('album')
@@ -62,22 +77,22 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
       {/* Stats row */}
       <div className="stats-row">
         <div className="stat-card glass stat-primary">
-          <div className="stat-card-icon">🎯</div>
+          <div className="stat-card-kicker">Owned</div>
           <div className="stat-card-value">{owned}</div>
           <div className="stat-card-label">Stickers owned</div>
         </div>
         <div className="stat-card glass">
-          <div className="stat-card-icon">🔍</div>
+          <div className="stat-card-kicker">Need</div>
           <div className="stat-card-value" style={{ color: 'var(--text-2)' }}>{needed}</div>
           <div className="stat-card-label">Still needed</div>
         </div>
         <div className="stat-card glass stat-blue">
-          <div className="stat-card-icon">📦</div>
+          <div className="stat-card-kicker">Dupes</div>
           <div className="stat-card-value">{duplicates}</div>
           <div className="stat-card-label">Duplicate stickers</div>
         </div>
         <div className="stat-card glass stat-green">
-          <div className="stat-card-icon">🌟</div>
+          <div className="stat-card-kicker">Rare</div>
           <div className="stat-card-value">{totalParallels}</div>
           <div className="stat-card-label">Rare parallels</div>
         </div>
@@ -189,6 +204,26 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
               ))}
             </div>
           )}
+
+          <div className="card glass">
+            <div className="section-title">Most Duplicated</div>
+            {mostDuplicated.length > 0 ? (
+              <div className="dupe-rank-list">
+                {mostDuplicated.map((sticker, index) => (
+                  <div key={sticker.id} className="dupe-rank-row">
+                    <span className="top-team-rank">#{index + 1}</span>
+                    <span className="dupe-rank-main">
+                      <span className="dupe-rank-id">{sticker.id}</span>
+                      <span className="dupe-rank-name">{sticker.name}</span>
+                    </span>
+                    <span className="dupe-rank-extra">+{sticker.extra}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="panel-empty">No duplicate stickers yet.</div>
+            )}
+          </div>
 
         </div>
       </div>

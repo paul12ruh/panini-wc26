@@ -267,7 +267,20 @@ body {
   border-radius: var(--radius-lg);
   padding: 20px 22px;
 }
-.stat-card-icon { font-size: 22px; margin-bottom: 12px; line-height: 1; }
+.stat-card-kicker {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
 .stat-card-value {
   font-family: 'Space Grotesk', sans-serif;
   font-size: 32px;
@@ -523,6 +536,49 @@ body {
 .top-team-flag { font-size: 16px; }
 .top-team-name { flex: 1; font-weight: 500; }
 .top-team-pct { color: var(--primary); font-weight: 700; }
+.dupe-rank-list { display: flex; flex-direction: column; gap: 4px; }
+.dupe-rank-row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.dupe-rank-row:hover { background: var(--surface-2); }
+.dupe-rank-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.dupe-rank-id {
+  font-family: 'Space Grotesk', sans-serif;
+  color: var(--blue);
+  font-weight: 800;
+}
+.dupe-rank-name {
+  color: var(--text-2);
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dupe-rank-extra {
+  min-width: 30px;
+  text-align: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(77,166,255,0.12);
+  color: var(--blue);
+  font-weight: 800;
+}
+.panel-empty {
+  color: var(--text-3);
+  font-size: 13px;
+  line-height: 1.4;
+}
 
 /* ─── ALBUM ─────────────────────────────── */
 .album-toolbar {
