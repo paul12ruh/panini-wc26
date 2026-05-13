@@ -41,8 +41,16 @@ export default function NavBar({ page, setPage, owned, signOut, syncStatus, sync
         <strong>{pct}%</strong>
         <span>{owned}/{TOTAL}</span>
       </div>
-      <div className={`nav-sync nav-sync-${syncStatus}`} title={syncLabel} aria-label={syncLabel}>
-        {syncStatus === 'error' ? '!' : syncStatus === 'saving' || syncStatus === 'loading' ? '...' : '✓'}
+      <div
+        className={`nav-sync nav-sync-${syncStatus}`}
+        title={syncLabel}
+        role="status"
+        aria-live="polite"
+      >
+        <span aria-hidden="true">
+          {syncStatus === 'error' ? '!' : syncStatus === 'saving' || syncStatus === 'loading' ? '...' : '✓'}
+        </span>
+        <span className="nav-sync-text">{syncStatus === 'error' ? syncLabel : ''}</span>
       </div>
       <button className="nav-signout" onClick={signOut} title="Sign out" aria-label="Sign out">↪</button>
     </nav>

@@ -53,7 +53,7 @@ Collection changes are saved immediately in the browser as a local cache, then s
 - Google sign-in
 - Email magic-link sign-in
 - Supabase-backed cloud sync through a `collections` table
-- Local browser cache under the `localStorage` key `panini-wc2026`
+- Local browser cache under the `localStorage` keys `panini-wc2026` and `panini-wc2026:meta`
 
 ## Tech stack
 

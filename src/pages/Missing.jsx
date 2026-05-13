@@ -1,6 +1,24 @@
 import { useMemo, useState } from 'react'
 import { SECTIONS } from '../data/stickers'
 
+const writeClipboard = async (text) => {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text)
+    return
+  }
+
+  const textarea = document.createElement('textarea')
+  textarea.value = text
+  textarea.setAttribute('readonly', '')
+  textarea.style.position = 'fixed'
+  textarea.style.top = '-9999px'
+  document.body.appendChild(textarea)
+  textarea.select()
+  const copied = document.execCommand('copy')
+  document.body.removeChild(textarea)
+  if (!copied) throw new Error('Clipboard unavailable')
+}
+
 export default function Missing({ collection }) {
   const [copied, setCopied] = useState(false)
   const [copyError, setCopyError] = useState('')
@@ -22,7 +40,7 @@ export default function Missing({ collection }) {
     )
     const text = `Missing stickers (${total} total)\n\n${lines.join('\n\n')}`
     setCopyError('')
-    navigator.clipboard.writeText(text)
+    writeClipboard(text)
       .then(() => {
         setCopied(true)
         setTimeout(() => setCopied(false), 2000)
@@ -40,8 +58,10 @@ export default function Missing({ collection }) {
     const a    = document.createElement('a')
     a.href = url
     a.download = 'missing-stickers.txt'
+    document.body.appendChild(a)
     a.click()
-    URL.revokeObjectURL(url)
+    document.body.removeChild(a)
+    setTimeout(() => URL.revokeObjectURL(url), 0)
   }
 
   if (groups.length === 0) return (

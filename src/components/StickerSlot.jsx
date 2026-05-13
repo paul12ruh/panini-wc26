@@ -19,11 +19,6 @@ function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetRarity }) {
   const isDup    = entry.qty > 1
   const rarityClass = owned && rarity !== 'base' ? `rarity-${rarity}` : ''
 
-  const openControls = (e) => {
-    e.stopPropagation()
-    setOpen(true)
-  }
-
   const closeControls = () => {
     setOpen(false)
     requestAnimationFrame(() => ref.current?.focus())
@@ -94,7 +89,7 @@ function StickerSlot({ sticker, entry, onToggle, onSetQty, onSetRarity }) {
         title={`${sticker.id} — ${sticker.name}`}
       >
         {owned && <div className="sticker-check">✓</div>}
-        {owned && <button className="sticker-edit" onClick={openControls} title="Edit sticker" aria-label={`Edit ${sticker.id}`}>⋯</button>}
+        {owned && <span className="sticker-edit" aria-hidden="true">⋯</span>}
         {isDup  && <div className="sticker-qty">×{entry.qty}</div>}
         <div className="sticker-id">{sticker.id}</div>
         <div className="sticker-name">{sticker.name}</div>

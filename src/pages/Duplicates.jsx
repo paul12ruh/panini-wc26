@@ -1,6 +1,24 @@
 import { useMemo, useState } from 'react'
 import { SECTIONS } from '../data/stickers'
 
+const writeClipboard = async (text) => {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text)
+    return
+  }
+
+  const textarea = document.createElement('textarea')
+  textarea.value = text
+  textarea.setAttribute('readonly', '')
+  textarea.style.position = 'fixed'
+  textarea.style.top = '-9999px'
+  document.body.appendChild(textarea)
+  textarea.select()
+  const copied = document.execCommand('copy')
+  document.body.removeChild(textarea)
+  if (!copied) throw new Error('Clipboard unavailable')
+}
+
 const RARITY_COLORS = {
   blue:   '#4da6ff',
   red:    '#ff5c5c',
@@ -41,7 +59,7 @@ export default function Duplicates({ collection }) {
     })
     const text = `Trade list (${totalDups} duplicates)\n\n${lines.join('\n')}`
     setCopyError('')
-    navigator.clipboard.writeText(text)
+    writeClipboard(text)
       .then(() => {
         setCopied(true)
         setTimeout(() => setCopied(false), 2000)
