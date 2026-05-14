@@ -132,6 +132,40 @@ body {
 }
 .nav-btn:hover { color: var(--text); background: var(--surface-2); }
 .nav-btn.active { color: var(--primary); background: rgba(0,229,160,0.08); }
+.nav-more-wrapper { display: none; position: relative; }
+.nav-more-menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 10px);
+  min-width: 148px;
+  padding: 6px;
+  border: 1px solid var(--border-2);
+  border-radius: 12px;
+  background: rgba(18,22,31,0.98);
+  box-shadow: 0 12px 34px rgba(0,0,0,0.48);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+.nav-more-menu button {
+  width: 100%;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+.nav-more-menu button:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
 .nav-progress {
   display: flex;
   align-items: center;
@@ -1466,14 +1500,16 @@ body {
 
 /* ─── NAV SIGN-OUT ───────────────── */
 .nav-signout {
-  background: none;
-  border: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
   color: var(--text-3);
   cursor: pointer;
-  font-size: 16px;
-  padding: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 9px;
   border-radius: 6px;
   transition: color 0.15s;
+  white-space: nowrap;
 }
 .nav-signout:hover { color: var(--text); }
 
@@ -1527,7 +1563,7 @@ body {
   .navbar {
     top: auto;
     bottom: 0;
-    height: 64px;
+    height: 66px;
     padding: 0 8px;
     justify-content: space-around;
     border-bottom: none;
@@ -1549,6 +1585,7 @@ body {
     flex: 1;
     min-width: 0;
     justify-content: space-around;
+    gap: 6px;
   }
 
   /* Each tab button: icon on top, label below, tall enough to tap */
@@ -1556,13 +1593,29 @@ body {
     flex-direction: column;
     gap: 2px;
     width: auto;
-    padding: 6px 4px;
+    padding: 7px 4px;
     font-size: 9px;
     min-width: 0;
     min-height: 44px;
     flex: 1;
     justify-content: center;
     border-radius: 10px;
+  }
+  .nav-secondary {
+    display: none;
+  }
+  .nav-more-wrapper {
+    display: block;
+    flex: 1;
+    min-width: 0;
+  }
+  .nav-more-wrapper .nav-btn {
+    width: 100%;
+    height: 100%;
+  }
+  .nav-more-menu {
+    right: 0;
+    bottom: calc(100% + 9px);
   }
   .nav-btn-label {
     position: static;
@@ -1585,8 +1638,29 @@ body {
   }
 
   /* 3. Dashboard team heatmap: 3 columns on mobile */
+  .group-block {
+    margin-bottom: 22px;
+  }
+  .group-block:last-child {
+    margin-bottom: 0;
+  }
+  .group-label {
+    margin-bottom: 10px;
+    padding-left: 0;
+    font-size: 12px;
+  }
   .team-comp-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .team-tile {
+    min-height: 104px;
+    padding: 12px;
+  }
+  .team-tile-name {
+    font-size: 11px;
+    white-space: normal;
+    min-height: 28px;
   }
 
   /* 4. Touch targets — minimum 44px height */
@@ -1613,9 +1687,7 @@ body {
     opacity: 1;
   }
   .nav-signout {
-    width: 44px;
-    height: 44px;
-    flex-shrink: 0;
+    display: none;
   }
   .voice-toast {
     width: calc(100vw - 28px);
