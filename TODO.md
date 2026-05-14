@@ -14,6 +14,7 @@ Owners:
 
 ## Open
 
+- [ ] [dev] Add live read-only share links — create revocable public share URLs that let someone view current collection progress without signing in or editing
 - [ ] [dev] Add Playwright smoke tests for main flows — cover dev auth, dashboard, album edit, missing list, tools CSV export, and mobile viewport
 - [ ] [future] Shared albums for collaborative collecting — use the planned album/member schema so multiple signed-in users can share one collection with roles, invites, and conflict-safe edits
 - [ ] [future] Native iPhone app for voice input — Web Speech API doesn't work on iOS Safari. Separate React Native / Expo project that reads/writes the same Supabase `collections` table via the user's session
