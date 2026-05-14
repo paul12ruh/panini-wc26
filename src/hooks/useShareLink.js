@@ -1,6 +1,26 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
+const getShareErrorMessage = (error, action) => {
+  const message = error?.message || ''
+  const details = error?.details || ''
+  const combined = `${message} ${details}`.toLowerCase()
+
+  if (combined.includes('authentication required') || combined.includes('jwt')) {
+    return 'Unable to create share link because this browser is not signed in to Supabase on this URL. Sign out and sign back in on the preview URL, then try again.'
+  }
+
+  if (combined.includes('function') && combined.includes('schema cache')) {
+    return 'Unable to create share link because the Supabase share-link migration is not available yet. Refresh after the migration finishes, then try again.'
+  }
+
+  if (combined.includes('collection_shares')) {
+    return 'Unable to create share link because the collection_shares table is unavailable. Confirm the read-only share-link migration ran successfully.'
+  }
+
+  return `Unable to ${action} share link.`
+}
+
 export function useShareLink({ disabled = false } = {}) {
   const [share, setShare] = useState(null)
   const [status, setStatus] = useState(disabled ? 'disabled' : 'idle')
@@ -28,7 +48,7 @@ export function useShareLink({ disabled = false } = {}) {
     if (loadError) {
       console.error('Unable to load collection share', loadError)
       setStatus('error')
-      setError('Unable to load share link.')
+      setError(getShareErrorMessage(loadError, 'load'))
       return
     }
 
@@ -49,7 +69,7 @@ export function useShareLink({ disabled = false } = {}) {
     if (rpcError) {
       console.error('Unable to create collection share', rpcError)
       setStatus('error')
-      setError('Unable to create share link.')
+      setError(getShareErrorMessage(rpcError, 'create'))
       return null
     }
 
@@ -67,7 +87,7 @@ export function useShareLink({ disabled = false } = {}) {
     if (rpcError) {
       console.error('Unable to disable collection share', rpcError)
       setStatus('error')
-      setError('Unable to disable share link.')
+      setError(getShareErrorMessage(rpcError, 'disable'))
       return
     }
 
