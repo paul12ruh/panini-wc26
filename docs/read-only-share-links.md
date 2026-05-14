@@ -61,3 +61,5 @@ Build and test this on `feature/read-only-share-links`, then merge only after th
 - Public data loader: `usePublicShare(slug)` calls `get_shared_collection(share_slug)`
 - Owner actions: `useShareLink()` calls `create_or_replace_collection_share()` and `disable_collection_share(share_id)`
 - Public share pages poll every 30 seconds to pick up recently synced cloud changes.
+- Public viewers can browse the Album tab, expand teams, open sticker inventory, and cannot edit quantities or variants.
+- Smoke coverage: `npm run test:smoke` mocks the public-share RPC and verifies read-only Album browsing plus absence of edit controls.

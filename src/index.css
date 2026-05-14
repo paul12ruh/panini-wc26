@@ -1001,6 +1001,9 @@ body {
   box-shadow: 0 6px 20px rgba(0,0,0,0.3);
   border-color: var(--border-2);
 }
+.sticker-slot.read-only {
+  cursor: pointer;
+}
 .sticker-slot.owned { background: rgba(0,229,160,0.05); border-color: rgba(0,229,160,0.22); }
 .sticker-slot.rarity-blue   { background: rgba(77,166,255,0.06);  border-color: rgba(77,166,255,0.35);  box-shadow: 0 0 12px rgba(77,166,255,0.10); }
 .sticker-slot.rarity-red    { background: rgba(255,92,92,0.06);   border-color: rgba(255,92,92,0.35);   box-shadow: 0 0 12px rgba(255,92,92,0.10); }
@@ -1106,6 +1109,27 @@ body {
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0,0,0,0.7);
   animation: popIn 0.15s ease;
+}
+.sticker-controls-readonly .rarity-tile {
+  min-height: 84px;
+  justify-content: center;
+}
+.readonly-sticker-summary {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.readonly-sticker-summary strong {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 22px;
+}
+.readonly-sticker-summary span {
+  color: var(--text-2);
+  font-size: 13px;
 }
 @keyframes popIn {
   from { opacity: 0; transform: translate(-50%, -50%) scale(0.94); }

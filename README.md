@@ -95,6 +95,14 @@ VITE_ENABLE_DEV_AUTH=false
 
 For local authenticated UI smoke testing without a real Supabase session, set `VITE_ENABLE_DEV_AUTH=true` in `.env` and restart `npm run dev`. This is dev-only, uses local cache only, and does not sync the mock user to Supabase.
 
+Run browser smoke tests with:
+
+```bash
+npm run test:smoke
+```
+
+The current smoke coverage includes the public read-only share route, Album tab browsing, team expansion, sticker inventory viewing, and a check that viewer mode does not expose sticker edit controls.
+
 Start the dev server:
 
 ```bash
@@ -116,7 +124,7 @@ The app is deployed on Vercel at https://panini-wc26-one.vercel.app — auto-dep
 
 The backend is a Supabase project (ref `wjnttgjbcttabpjzamoh`) with Google OAuth + email magic link enabled and a `collections` table (RLS scoped to `auth.uid()`).
 
-Read-only public share links require the `collection_shares` migration and RPCs in `supabase/migrations/202605140001_read_only_share_links.sql`. Public viewers read through a narrow RPC keyed by an enabled share slug; the `collections` table should remain private under RLS.
+Read-only public share links require the `collection_shares` migration and RPCs in `supabase/migrations/202605140001_read_only_share_links.sql`. Public viewers read through a narrow RPC keyed by an enabled share slug; the `collections` table should remain private under RLS. If `generate_share_slug()` fails on Supabase with `gen_random_bytes(integer) does not exist`, apply `supabase/migrations/202605140002_fix_share_slug_pgcrypto_schema.sql`.
 
 `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` must be set in both `.env` (local) and Vercel → Project Settings → Environment Variables.
 

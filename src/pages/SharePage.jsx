@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Dashboard from './Dashboard'
+import Album from './Album'
 import Missing from './Missing'
 import Duplicates from './Duplicates'
 import Stats from './Stats'
@@ -8,6 +9,7 @@ import { calculateCollectionStats } from '../lib/collectionStats'
 
 const SHARE_TABS = [
   { id: 'dashboard', label: 'Progress' },
+  { id: 'album', label: 'Album' },
   { id: 'missing', label: 'Missing' },
   { id: 'dupes', label: 'Duplicates' },
   { id: 'stats', label: 'Stats' },
@@ -16,10 +18,17 @@ const SHARE_TABS = [
 export default function SharePage({ slug }) {
   const [tab, setTab] = useState('dashboard')
   const [heatmapSort, setHeatmapSort] = useState('group')
+  const [focusSection, setFocusSection] = useState(null)
+  const [focusSticker, setFocusSticker] = useState(null)
   const { collection, updatedAt, status, error, refresh } = usePublicShare(slug)
   const { owned, duplicates } = calculateCollectionStats(collection)
   const loading = status === 'loading'
   const refreshing = status === 'refreshing'
+  const openAlbumSection = (sectionId) => {
+    setFocusSection(sectionId)
+    setFocusSticker(null)
+    setTab('album')
+  }
 
   if (loading) {
     return (
@@ -87,6 +96,17 @@ export default function SharePage({ slug }) {
           duplicates={duplicates}
           heatmapSort={heatmapSort}
           setHeatmapSort={setHeatmapSort}
+          readOnly
+          onOpenSection={openAlbumSection}
+        />
+      )}
+      {tab === 'album' && (
+        <Album
+          collection={collection}
+          focusSection={focusSection}
+          setFocusSection={setFocusSection}
+          focusSticker={focusSticker}
+          setFocusSticker={setFocusSticker}
           readOnly
         />
       )}

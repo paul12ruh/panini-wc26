@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { SECTIONS, TOTAL } from '../data/stickers'
 
-export default function Dashboard({ collection, owned, duplicates, setPage, setFocusSection, heatmapSort, setHeatmapSort, readOnly = false }) {
+export default function Dashboard({ collection, owned, duplicates, setPage, setFocusSection, heatmapSort, setHeatmapSort, readOnly = false, onOpenSection }) {
   const needed = TOTAL - owned
   const pct    = TOTAL ? ((owned / TOTAL) * 100).toFixed(1) : 0
 
@@ -48,13 +48,15 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
       .slice(0, 5)
   }, [collection])
   const openSection = (id) => {
-    if (readOnly) return
-    setFocusSection(id)
-    setPage('album')
+    if (readOnly) {
+      onOpenSection?.(id)
+      return
+    }
+    setFocusSection?.(id)
+    setPage?.('album')
   }
 
   const handleNavKeyDown = (e, id) => {
-    if (readOnly) return
     if (e.key !== 'Enter' && e.key !== ' ') return
     e.preventDefault()
     openSection(id)
@@ -124,8 +126,8 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
                   className={`team-tile glass ${ts.pct === 100 ? 'complete' : ''}`}
                   onClick={() => openSection(ts.id)}
                   onKeyDown={e => handleNavKeyDown(e, ts.id)}
-                  role={readOnly ? undefined : 'button'}
-                  tabIndex={readOnly ? undefined : 0}
+                  role="button"
+                  tabIndex={0}
                   title={`${ts.name}: ${ts.ownedCount}/${ts.stickers.length}`}
                 >
                   <div className="team-tile-flag">{ts.flag || '🏆'}</div>
@@ -176,8 +178,8 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
                 className="top-team-row"
                 onClick={() => openSection(ts.id)}
                 onKeyDown={e => handleNavKeyDown(e, ts.id)}
-                role={readOnly ? undefined : 'button'}
-                tabIndex={readOnly ? undefined : 0}
+                role="button"
+                tabIndex={0}
               >
                 <span className="top-team-rank">#{i + 1}</span>
                 <span className="top-team-flag">{ts.flag}</span>
@@ -196,16 +198,23 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
                   key={ts.id}
                   className="top-team-row"
                   onClick={() => {
-                    if (!readOnly) setPage('missing')
+                    if (readOnly) {
+                      onOpenSection?.(ts.id)
+                      return
+                    }
+                    setPage?.('missing')
                   }}
                   onKeyDown={e => {
-                    if (readOnly) return
                     if (e.key !== 'Enter' && e.key !== ' ') return
                     e.preventDefault()
-                    setPage('missing')
+                    if (readOnly) {
+                      onOpenSection?.(ts.id)
+                      return
+                    }
+                    setPage?.('missing')
                   }}
-                  role={readOnly ? undefined : 'button'}
-                  tabIndex={readOnly ? undefined : 0}
+                  role="button"
+                  tabIndex={0}
                 >
                   <span className="top-team-rank">{ts.stickers.length - ts.ownedCount}</span>
                   <span className="top-team-flag">{ts.flag}</span>
