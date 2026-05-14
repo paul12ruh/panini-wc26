@@ -267,6 +267,14 @@ export function useCollection() {
     })
   }, [])
 
+  const resetCollection = useCallback(() => {
+    setCollection({})
+    const updatedAt = save({})
+    setLastUpdatedAt(updatedAt)
+    saveActivity([])
+    setActivity([])
+  }, [])
+
   const exportJSON = useCallback(() => {
     const blob = new Blob([JSON.stringify(collection, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
@@ -315,5 +323,6 @@ export function useCollection() {
     lastUpdatedAt,
     activity,
     undoLastActivity,
+    resetCollection,
   }
 }

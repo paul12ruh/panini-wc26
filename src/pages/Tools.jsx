@@ -144,7 +144,7 @@ const buildTradeText = (collection) => {
   ].join('\n')
 }
 
-export default function Tools({ collection, setRarity, activity, undoLastActivity, owned, duplicates }) {
+export default function Tools({ collection, setRarity, activity, undoLastActivity, resetCollection, owned, duplicates }) {
   const [quickValue, setQuickValue] = useState('')
   const [quickRarity, setQuickRarity] = useState('base')
   const [quickMessage, setQuickMessage] = useState('')
@@ -153,6 +153,7 @@ export default function Tools({ collection, setRarity, activity, undoLastActivit
   const [packMessage, setPackMessage] = useState('')
   const [packMisses, setPackMisses] = useState([])
   const [copied, setCopied] = useState(false)
+  const [resetMessage, setResetMessage] = useState('')
 
   const tradeText = useMemo(() => buildTradeText(collection), [collection])
   const tradeCsv = useMemo(() => buildTradeCsv(collection), [collection])
@@ -226,6 +227,18 @@ export default function Tools({ collection, setRarity, activity, undoLastActivit
 
   const handleExportTradeCsv = () => {
     downloadTextFile('panini-wc26-trade-sheet.csv', tradeCsv, 'text/csv;charset=utf-8')
+  }
+
+  const handleResetCollection = () => {
+    const confirmation = window.prompt('This will delete your entire collection and sync the empty collection to your account. Type RESET to continue.')
+    if (confirmation !== 'RESET') return
+    resetCollection()
+    setPackText('')
+    setPackMessage('')
+    setPackMisses([])
+    setQuickValue('')
+    setQuickMessage('')
+    setResetMessage('Collection reset. Cloud sync will save the empty collection shortly.')
   }
 
   return (
@@ -340,6 +353,26 @@ export default function Tools({ collection, setRarity, activity, undoLastActivit
               <button className="btn btn-primary" onClick={handleCopyTrade}>{copied ? 'Copied' : 'Copy trade sheet'}</button>
               <button className="btn btn-ghost" onClick={handleExportTradeCsv}>Export CSV</button>
             </div>
+          </section>
+        </section>
+
+        <section className="tool-section">
+          <div className="tool-section-heading">
+            <span>4</span>
+            <div>
+              <h2>Danger Zone</h2>
+              <p>Reset the tracker when a bad import or test run needs to be cleared.</p>
+            </div>
+          </div>
+          <section className="tool-panel glass danger-panel">
+            <div>
+              <div className="section-title">Reset Collection</div>
+              <div className="tool-note">Deletes all owned stickers, duplicates, variants, and recent activity for this account.</div>
+            </div>
+            <button className="btn btn-danger" onClick={handleResetCollection} disabled={owned === 0 && duplicates === 0}>
+              Reset collection
+            </button>
+            {resetMessage && <div className="tool-warning neutral" role="status">{resetMessage}</div>}
           </section>
         </section>
       </div>

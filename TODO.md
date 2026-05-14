@@ -20,6 +20,7 @@ Owners:
 
 ## Done
 
+- [x] 2026-05-13 — Add confirmed reset collection action that clears local and synced data
 - [x] 2026-05-13 — Clean up mobile bottom navigation and dashboard group spacing
 - [x] 2026-05-13 — Make duplicate voice confirmations clickable without unsafe undo behavior
 - [x] 2026-05-13 — Make voice confirmation toast navigate to the updated sticker

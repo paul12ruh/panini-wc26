@@ -26,7 +26,7 @@ export default function App() {
     collection, get, toggle,
     setQty, setRarity, setVariantQty,
     owned, duplicates, loadCollection, lastUpdatedAt,
-    activity, undoLastActivity,
+    activity, undoLastActivity, resetCollection,
   } = useCollection()
 
   const { session, loading: authLoading, signIn, signInWithGoogle, signOut } = useAuth()
@@ -88,6 +88,7 @@ export default function App() {
           setRarity={setRarity}
           activity={activity}
           undoLastActivity={undoLastActivity}
+          resetCollection={resetCollection}
           owned={owned}
           duplicates={duplicates}
         />
