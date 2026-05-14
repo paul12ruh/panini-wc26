@@ -4,7 +4,9 @@ import { supabase } from '../lib/supabase'
 const getShareErrorMessage = (error, action) => {
   const message = error?.message || ''
   const details = error?.details || ''
+  const code = error?.code || ''
   const combined = `${message} ${details}`.toLowerCase()
+  const diagnostic = [code, message, details].filter(Boolean).join(' - ')
 
   if (combined.includes('authentication required') || combined.includes('jwt')) {
     return 'Unable to create share link because this browser is not signed in to Supabase on this URL. Sign out and sign back in on the preview URL, then try again.'
@@ -18,7 +20,9 @@ const getShareErrorMessage = (error, action) => {
     return 'Unable to create share link because the collection_shares table is unavailable. Confirm the read-only share-link migration ran successfully.'
   }
 
-  return `Unable to ${action} share link.`
+  return diagnostic
+    ? `Unable to ${action} share link: ${diagnostic}`
+    : `Unable to ${action} share link.`
 }
 
 export function useShareLink({ disabled = false } = {}) {
