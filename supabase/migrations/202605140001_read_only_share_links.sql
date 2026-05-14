@@ -1,7 +1,7 @@
 -- Live read-only share links for the current user-scoped collection model.
 -- Public viewers read through a narrow RPC; collections RLS should remain private.
 
-create extension if not exists pgcrypto;
+create extension if not exists pgcrypto with schema extensions;
 
 create table if not exists public.collection_shares (
   id uuid primary key default gen_random_uuid(),
@@ -46,7 +46,7 @@ language sql
 volatile
 as $$
   select regexp_replace(
-    translate(encode(gen_random_bytes(18), 'base64'), '+/', '-_'),
+    translate(encode(extensions.gen_random_bytes(18), 'base64'), '+/', '-_'),
     '=+$',
     ''
   );
