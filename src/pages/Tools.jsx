@@ -172,6 +172,7 @@ export default function Tools({ collection, setRarity, activity, undoLastActivit
       const sectionOwned = section.stickers.filter(sticker => collection[sticker.id]?.qty > 0).length
       return { ...section, owned: sectionOwned, total: section.stickers.length, pct: Math.round((sectionOwned / section.stickers.length) * 100) }
     })
+    const teamSections = ownedSections.filter(section => section.type === 'team')
     const duplicateEntries = ALL_STICKERS
       .map(sticker => ({ ...sticker, extra: Math.max(0, (collection[sticker.id]?.qty || 0) - 1) }))
       .filter(sticker => sticker.extra > 0)
@@ -184,8 +185,8 @@ export default function Tools({ collection, setRarity, activity, undoLastActivit
 
     return {
       pct: TOTAL ? Math.round((owned / TOTAL) * 100) : 0,
-      closest: ownedSections.filter(section => section.pct < 100).sort((a, b) => b.pct - a.pct)[0],
-      weakest: ownedSections.filter(section => section.pct < 100).sort((a, b) => a.pct - b.pct)[0],
+      closest: teamSections.filter(section => section.pct < 100).sort((a, b) => b.pct - a.pct)[0],
+      weakest: teamSections.filter(section => section.pct < 100).sort((a, b) => a.pct - b.pct || a.name.localeCompare(b.name))[0],
       topDuplicate: duplicateEntries[0],
       variantTotals,
     }
