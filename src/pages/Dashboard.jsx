@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { SECTIONS, TOTAL } from '../data/stickers'
 
-export default function Dashboard({ collection, owned, duplicates, setPage, setFocusSection, heatmapSort, setHeatmapSort }) {
+export default function Dashboard({ collection, owned, duplicates, setPage, setFocusSection, heatmapSort, setHeatmapSort, readOnly = false, onOpenSection }) {
   const needed = TOTAL - owned
   const pct    = TOTAL ? ((owned / TOTAL) * 100).toFixed(1) : 0
 
@@ -48,8 +48,12 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
       .slice(0, 5)
   }, [collection])
   const openSection = (id) => {
-    setFocusSection(id)
-    setPage('album')
+    if (readOnly) {
+      onOpenSection?.(id)
+      return
+    }
+    setFocusSection?.(id)
+    setPage?.('album')
   }
 
   const handleNavKeyDown = (e, id) => {
@@ -193,11 +197,21 @@ export default function Dashboard({ collection, owned, duplicates, setPage, setF
                 <div
                   key={ts.id}
                   className="top-team-row"
-                  onClick={() => setPage('missing')}
+                  onClick={() => {
+                    if (readOnly) {
+                      onOpenSection?.(ts.id)
+                      return
+                    }
+                    setPage?.('missing')
+                  }}
                   onKeyDown={e => {
                     if (e.key !== 'Enter' && e.key !== ' ') return
                     e.preventDefault()
-                    setPage('missing')
+                    if (readOnly) {
+                      onOpenSection?.(ts.id)
+                      return
+                    }
+                    setPage?.('missing')
                   }}
                   role="button"
                   tabIndex={0}

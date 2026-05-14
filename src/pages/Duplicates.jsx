@@ -44,7 +44,7 @@ const variantSummary = (variants = {}) => {
     .join(' · ')
 }
 
-export default function Duplicates({ collection }) {
+export default function Duplicates({ collection, readOnly = false }) {
   const [copied, setCopied] = useState(false)
   const [copyError, setCopyError] = useState('')
 
@@ -107,12 +107,16 @@ export default function Duplicates({ collection }) {
         <div className="page-subtitle">{totalDups} extra stickers ready to trade</div>
       </div>
 
-      <div className="list-toolbar">
-        <button className="btn btn-primary" onClick={copyTrade}>
-          {copied ? '✓ Copied!' : '📋 Copy trade list'}
-        </button>
-      </div>
-      {copyError && <div className="inline-error">{copyError}</div>}
+      {!readOnly && (
+        <>
+          <div className="list-toolbar">
+            <button className="btn btn-primary" onClick={copyTrade}>
+              {copied ? '✓ Copied!' : '📋 Copy trade list'}
+            </button>
+          </div>
+          {copyError && <div className="inline-error">{copyError}</div>}
+        </>
+      )}
 
       {groups.map(g => (
         <div key={g.id} className="group-card glass">

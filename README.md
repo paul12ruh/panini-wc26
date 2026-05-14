@@ -45,6 +45,11 @@ Collection changes are saved immediately in the browser as a local cache, then s
 - Foil and parallel rarity breakdown
 - Completion totals by confederation
 
+### Read-only sharing
+- Create a revocable public share link from Tools
+- Share links show current synced progress without requiring sign-in
+- Viewers can inspect progress, missing stickers, duplicates, and stats but cannot edit
+
 ### Voice input
 - Browser speech-recognition shortcut for marking stickers by saying a team and number, such as "France 7"
 - Duplicate guard with undo toast after marking
@@ -90,6 +95,14 @@ VITE_ENABLE_DEV_AUTH=false
 
 For local authenticated UI smoke testing without a real Supabase session, set `VITE_ENABLE_DEV_AUTH=true` in `.env` and restart `npm run dev`. This is dev-only, uses local cache only, and does not sync the mock user to Supabase.
 
+Run browser smoke tests with:
+
+```bash
+npm run test:smoke
+```
+
+The current smoke coverage includes the public read-only share route, Album tab browsing, team expansion, sticker inventory viewing, and a check that viewer mode does not expose sticker edit controls.
+
 Start the dev server:
 
 ```bash
@@ -110,6 +123,8 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 The app is deployed on Vercel at https://panini-wc26-one.vercel.app — auto-deploys on push to `main`, feature branches get preview URLs. Source repo: https://github.com/paul12ruh/panini-wc26.
 
 The backend is a Supabase project (ref `wjnttgjbcttabpjzamoh`) with Google OAuth + email magic link enabled and a `collections` table (RLS scoped to `auth.uid()`).
+
+Read-only public share links require the `collection_shares` migration and RPCs in `supabase/migrations/202605140001_read_only_share_links.sql`. Public viewers read through a narrow RPC keyed by an enabled share slug; the `collections` table should remain private under RLS. If `generate_share_slug()` fails on Supabase with `gen_random_bytes(integer) does not exist`, apply `supabase/migrations/202605140002_fix_share_slug_pgcrypto_schema.sql`.
 
 `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` must be set in both `.env` (local) and Vercel → Project Settings → Environment Variables.
 

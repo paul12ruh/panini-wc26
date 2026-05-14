@@ -20,6 +20,7 @@ export default function Album({
   focusSticker,
   setFocusSticker,
   setPage,
+  readOnly = false,
 }) {
   const [search,      setSearch]      = useState('')
   const [filter,      setFilter]      = useState('All')
@@ -100,11 +101,17 @@ export default function Album({
   return (
     <div className="page">
       <div className="page-header">
-        <button className="btn btn-ghost" style={{ marginBottom: 8, fontSize: 13 }} onClick={() => setPage('dashboard')}>
-          ← Dashboard
-        </button>
+        {setPage && (
+          <button className="btn btn-ghost" style={{ marginBottom: 8, fontSize: 13 }} onClick={() => setPage('dashboard')}>
+            Dashboard
+          </button>
+        )}
         <div className="page-title">Album</div>
-        <div className="page-subtitle">Click a sticker to mark it owned · click again to adjust quantity & frame</div>
+        <div className="page-subtitle">
+          {readOnly
+            ? 'Open a team to view its stickers, acquired cards, quantities, and color inventory.'
+            : 'Click a sticker to mark it owned · click again to adjust quantity & frame'}
+        </div>
       </div>
 
       <div className="album-toolbar">
@@ -187,6 +194,7 @@ export default function Album({
                       onSetQty={setQty}
                       onSetRarity={setRarity}
                       onSetVariantQty={setVariantQty}
+                      readOnly={readOnly}
                     />
                   ))}
                 </div>

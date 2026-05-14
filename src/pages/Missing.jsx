@@ -19,7 +19,7 @@ const writeClipboard = async (text) => {
   if (!copied) throw new Error('Clipboard unavailable')
 }
 
-export default function Missing({ collection }) {
+export default function Missing({ collection, readOnly = false }) {
   const [copied, setCopied] = useState(false)
   const [copyError, setCopyError] = useState('')
 
@@ -81,15 +81,19 @@ export default function Missing({ collection }) {
         <div className="page-subtitle">{total} stickers still needed across {groups.length} sections</div>
       </div>
 
-      <div className="list-toolbar">
-        <button className="btn btn-primary" onClick={copyList}>
-          {copied ? '✓ Copied!' : '📋 Copy list'}
-        </button>
-        <button className="btn btn-ghost" onClick={exportTxt}>
-          ⬇ Export .txt
-        </button>
-      </div>
-      {copyError && <div className="inline-error">{copyError}</div>}
+      {!readOnly && (
+        <>
+          <div className="list-toolbar">
+            <button className="btn btn-primary" onClick={copyList}>
+              {copied ? '✓ Copied!' : '📋 Copy list'}
+            </button>
+            <button className="btn btn-ghost" onClick={exportTxt}>
+              ⬇ Export .txt
+            </button>
+          </div>
+          {copyError && <div className="inline-error">{copyError}</div>}
+        </>
+      )}
 
       {groups.map(g => (
         <div key={g.id} className="group-card glass">

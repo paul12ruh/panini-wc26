@@ -12,7 +12,7 @@ const RARITIES = [
 
 const EMPTY_VARIANTS = { base: 0, blue: 0, red: 0, purple: 0, green: 0, black: 0 }
 
-function StickerSlot({ sticker, entry, highlighted, onToggle, onSetQty, onSetRarity, onSetVariantQty }) {
+function StickerSlot({ sticker, entry, highlighted, onToggle, onSetQty, onSetRarity, onSetVariantQty, readOnly = false }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
   const closeRef = useRef(null)
@@ -30,6 +30,10 @@ function StickerSlot({ sticker, entry, highlighted, onToggle, onSetQty, onSetRar
 
   const handleClick = (e) => {
     e.stopPropagation()
+    if (readOnly) {
+      setOpen(true)
+      return
+    }
     if (owned) {
       setOpen(true)
     } else {
@@ -40,6 +44,10 @@ function StickerSlot({ sticker, entry, highlighted, onToggle, onSetQty, onSetRar
   const handleKeyDown = (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return
     e.preventDefault()
+    if (readOnly) {
+      setOpen(true)
+      return
+    }
     if (owned) {
       setOpen(true)
     } else {
@@ -84,7 +92,7 @@ function StickerSlot({ sticker, entry, highlighted, onToggle, onSetQty, onSetRar
         <>
           <div className="popover-overlay" onClick={closeControls} />
           <div
-            className="sticker-controls"
+            className={`sticker-controls ${readOnly ? 'sticker-controls-readonly' : ''}`}
             onClick={e => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
@@ -112,23 +120,25 @@ function StickerSlot({ sticker, entry, highlighted, onToggle, onSetQty, onSetRar
                     />
                     <span className="rarity-tile-label">{label}</span>
                     <span className="variant-count">{variants[key] || 0}</span>
-                    <span className="variant-stepper">
-                      <button
-                        className="variant-step-btn"
-                        onClick={() => onSetVariantQty(sticker.id, key, (variants[key] || 0) - 1)}
-                        disabled={(variants[key] || 0) <= 0}
-                        aria-label={`Decrease ${label} ${sticker.id} quantity`}
-                      >
-                        −
-                      </button>
-                      <button
-                        className="variant-step-btn"
-                        onClick={() => onSetRarity(sticker.id, key)}
-                        aria-label={`Add ${label} ${sticker.id}`}
-                      >
-                        +
-                      </button>
-                    </span>
+                    {!readOnly && (
+                      <span className="variant-stepper">
+                        <button
+                          className="variant-step-btn"
+                          onClick={() => onSetVariantQty(sticker.id, key, (variants[key] || 0) - 1)}
+                          disabled={(variants[key] || 0) <= 0}
+                          aria-label={`Decrease ${label} ${sticker.id} quantity`}
+                        >
+                          −
+                        </button>
+                        <button
+                          className="variant-step-btn"
+                          onClick={() => onSetRarity(sticker.id, key)}
+                          aria-label={`Add ${label} ${sticker.id}`}
+                        >
+                          +
+                        </button>
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -136,26 +146,35 @@ function StickerSlot({ sticker, entry, highlighted, onToggle, onSetQty, onSetRar
 
             <div>
               <div className="controls-title" style={{ marginBottom: 8 }}>Quantity</div>
-              <div className="qty-row">
-                <button
-                  className="qty-btn"
-                  onClick={() => onSetQty(sticker.id, entry.qty - 1)}
-                  disabled={entry.qty <= 1}
-                  aria-label={`Decrease ${sticker.id} quantity`}
-                >
-                  −
-                </button>
-                <div className="qty-value">{entry.qty}</div>
-                <button className="qty-btn" onClick={() => onSetQty(sticker.id, entry.qty + 1)} aria-label={`Increase ${sticker.id} quantity`}>+</button>
-              </div>
+              {readOnly ? (
+                <div className="readonly-sticker-summary">
+                  <strong>{entry.qty}</strong>
+                  <span>{owned ? 'owned in this collection' : 'not acquired yet'}</span>
+                </div>
+              ) : (
+                <div className="qty-row">
+                  <button
+                    className="qty-btn"
+                    onClick={() => onSetQty(sticker.id, entry.qty - 1)}
+                    disabled={entry.qty <= 1}
+                    aria-label={`Decrease ${sticker.id} quantity`}
+                  >
+                    −
+                  </button>
+                  <div className="qty-value">{entry.qty}</div>
+                  <button className="qty-btn" onClick={() => onSetQty(sticker.id, entry.qty + 1)} aria-label={`Increase ${sticker.id} quantity`}>+</button>
+                </div>
+              )}
             </div>
 
-            <button
-              className="unmark-btn"
-              onClick={() => { onSetQty(sticker.id, 0); closeControls() }}
-            >
-              ✕ Unmark sticker
-            </button>
+            {!readOnly && (
+              <button
+                className="unmark-btn"
+                onClick={() => { onSetQty(sticker.id, 0); closeControls() }}
+              >
+                ✕ Unmark sticker
+              </button>
+            )}
           </div>
         </>,
         document.body
@@ -166,7 +185,7 @@ function StickerSlot({ sticker, entry, highlighted, onToggle, onSetQty, onSetRar
       <div
         id={`sticker-${sticker.id}`}
         ref={ref}
-        className={`sticker-slot ${owned ? 'owned' : ''} ${rarityClass} ${highlighted ? 'highlighted' : ''}`}
+        className={`sticker-slot ${owned ? 'owned' : ''} ${rarityClass} ${highlighted ? 'highlighted' : ''} ${readOnly ? 'read-only' : ''}`}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         role="button"
@@ -175,7 +194,7 @@ function StickerSlot({ sticker, entry, highlighted, onToggle, onSetQty, onSetRar
         title={`${sticker.id} — ${sticker.name}`}
       >
         {owned && <div className="sticker-check">✓</div>}
-        {owned && <span className="sticker-edit" aria-hidden="true">⋯</span>}
+        {owned && !readOnly && <span className="sticker-edit" aria-hidden="true">⋯</span>}
         {isDup  && <div className="sticker-qty">×{entry.qty}</div>}
         <div className="sticker-id">{sticker.id}</div>
         <div className="sticker-name">{sticker.name}</div>

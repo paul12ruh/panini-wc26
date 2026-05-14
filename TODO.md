@@ -14,12 +14,15 @@ Owners:
 
 ## Open
 
-- [ ] [dev] Add Playwright smoke tests for main flows — cover dev auth, dashboard, album edit, missing list, tools CSV export, and mobile viewport
+- [ ] [dev] Finish read-only share-link verification before merge — owner create and signed-out `/share/:slug` are working; still confirm copy/regenerate/disable behavior on the Vercel preview
+- [ ] [dev] Expand Playwright smoke tests for main flows — read-only share Album browsing is covered; still add dev auth, owner dashboard, album edit, missing list, tools CSV export, and mobile viewport
 - [ ] [future] Shared albums for collaborative collecting — use the planned album/member schema so multiple signed-in users can share one collection with roles, invites, and conflict-safe edits
 - [ ] [future] Native iPhone app for voice input — Web Speech API doesn't work on iOS Safari. Separate React Native / Expo project that reads/writes the same Supabase `collections` table via the user's session
 
 ## Done
 
+- [x] 2026-05-14 — Add read-only Album browsing to public share links with Playwright smoke coverage
+- [x] 2026-05-13 — Add live read-only share links with public progress view and owner controls
 - [x] 2026-05-13 — Add confirmed reset collection action that clears local and synced data
 - [x] 2026-05-13 — Clean up mobile bottom navigation and dashboard group spacing
 - [x] 2026-05-13 — Make duplicate voice confirmations clickable without unsafe undo behavior
