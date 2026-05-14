@@ -6,6 +6,7 @@ import Missing    from './pages/Missing'
 import Duplicates from './pages/Duplicates'
 import Stats      from './pages/Stats'
 import Tools      from './pages/Tools'
+import SharePage  from './pages/SharePage'
 import VoiceInput from './components/VoiceInput'
 import { useCollection } from './hooks/useCollection'
 import { useAuth } from './hooks/useAuth'
@@ -18,6 +19,7 @@ const findStickerSectionId = (stickerId) => (
 )
 
 export default function App() {
+  const shareMatch = window.location.pathname.match(/^\/share\/([^/]+)\/?$/)
   const [page, setPage] = useState('dashboard')
   const [focusSection, setFocusSection] = useState(null)
   const [focusSticker, setFocusSticker] = useState(null)
@@ -33,6 +35,7 @@ export default function App() {
   const syncSession = session?.__mock ? null : session
   const { syncStatus, syncError, lastSyncedAt } = useSync(collection, syncSession, loadCollection, lastUpdatedAt)
 
+  if (shareMatch) return <SharePage slug={decodeURIComponent(shareMatch[1])} />
   if (authLoading) return <div className="auth-loading">Loading…</div>
   if (!session)    return <AuthGate signIn={signIn} signInWithGoogle={signInWithGoogle} />
 
@@ -89,6 +92,7 @@ export default function App() {
           activity={activity}
           undoLastActivity={undoLastActivity}
           resetCollection={resetCollection}
+          shareDisabled={Boolean(session?.__mock)}
           owned={owned}
           duplicates={duplicates}
         />

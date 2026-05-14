@@ -52,3 +52,12 @@ The share page reads the owner's existing `collections` row through an enabled s
 ## Branch Strategy
 
 Build and test this on `feature/read-only-share-links`, then merge only after the Supabase policies and read-only page are verified.
+
+## Implementation Notes
+
+- Migration: `supabase/migrations/202605140001_read_only_share_links.sql`
+- Owner controls: `Tools` -> `Share Progress` -> `Read-only Share Link`
+- Public route: `/share/:slug`
+- Public data loader: `usePublicShare(slug)` calls `get_shared_collection(share_slug)`
+- Owner actions: `useShareLink()` calls `create_or_replace_collection_share()` and `disable_collection_share(share_id)`
+- Public share pages poll every 30 seconds to pick up recently synced cloud changes.

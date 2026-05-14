@@ -1,7 +1,16 @@
 import { useMemo, useState } from 'react'
 import { ALL_STICKERS, SECTIONS, TEAMS, TOTAL } from '../data/stickers'
+import ShareLinkControls from '../components/ShareLinkControls'
 
 const RARITIES = ['base', 'blue', 'red', 'purple', 'green', 'black']
+const RARITY_META = {
+  base: { label: 'Base', color: '#8d96a3' },
+  blue: { label: 'Blue', color: '#4da6ff' },
+  red: { label: 'Red', color: '#ff5c5c' },
+  purple: { label: 'Purple', color: '#b06efc' },
+  green: { label: 'Green', color: '#39ff89' },
+  black: { label: 'Black', color: '#e0e0e0' },
+}
 const TEAM_NAME_TO_CODE = Object.fromEntries(
   TEAMS.flatMap(team => [
     [team.code.toLowerCase(), team.code],
@@ -144,7 +153,7 @@ const buildTradeText = (collection) => {
   ].join('\n')
 }
 
-export default function Tools({ collection, setRarity, activity, undoLastActivity, resetCollection, owned, duplicates }) {
+export default function Tools({ collection, setRarity, activity, undoLastActivity, resetCollection, shareDisabled, owned, duplicates }) {
   const [quickValue, setQuickValue] = useState('')
   const [quickRarity, setQuickRarity] = useState('base')
   const [quickMessage, setQuickMessage] = useState('')
@@ -239,6 +248,7 @@ export default function Tools({ collection, setRarity, activity, undoLastActivit
     setQuickValue('')
     setQuickMessage('')
     setResetMessage('Collection reset. Cloud sync will save the empty collection shortly.')
+    setTimeout(() => setResetMessage(''), 3500)
   }
 
   return (
@@ -318,7 +328,18 @@ export default function Tools({ collection, setRarity, activity, undoLastActivit
                 <div className="insight-card"><span>Closest section</span><strong>{insights.closest ? `${insights.closest.name} ${insights.closest.pct}%` : 'Complete'}</strong></div>
                 <div className="insight-card"><span>Needs focus</span><strong>{insights.weakest ? `${insights.weakest.name} ${insights.weakest.pct}%` : 'Complete'}</strong></div>
                 <div className="insight-card"><span>Top duplicate</span><strong>{insights.topDuplicate ? `${insights.topDuplicate.id} +${insights.topDuplicate.extra}` : 'None'}</strong></div>
-                <div className="insight-card"><span>Variants</span><strong>{RARITIES.map(rarity => `${rarity[0].toUpperCase()}:${insights.variantTotals[rarity]}`).join(' ')}</strong></div>
+                <div className="insight-card insight-card-variants">
+                  <span>Variants</span>
+                  <div className="variant-total-list">
+                    {RARITIES.map(rarity => (
+                      <div key={rarity} className="variant-total">
+                        <span className="variant-total-dot" style={{ background: RARITY_META[rarity].color }} />
+                        <span className="variant-total-label">{RARITY_META[rarity].label}</span>
+                        <strong>{insights.variantTotals[rarity]}</strong>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </section>
 
@@ -342,18 +363,24 @@ export default function Tools({ collection, setRarity, activity, undoLastActivit
           <div className="tool-section-heading">
             <span>3</span>
             <div>
-              <h2>Share For Trading</h2>
-              <p>Copy a clean missing and duplicate list for other collectors.</p>
+              <h2>Share Progress</h2>
+              <p>Create a read-only live link or copy a trade sheet for other collectors.</p>
             </div>
           </div>
-          <section className="tool-panel glass">
-            <div className="section-title">Trade Sheet</div>
-            <textarea className="tool-textarea trade-textarea" value={tradeText} readOnly aria-label="Trade sheet" />
-            <div className="tool-actions tool-actions-wrap">
-              <button className="btn btn-primary" onClick={handleCopyTrade}>{copied ? 'Copied' : 'Copy trade sheet'}</button>
-              <button className="btn btn-ghost" onClick={handleExportTradeCsv}>Export CSV</button>
-            </div>
-          </section>
+          <div className="tools-grid">
+            <section className="tool-panel glass">
+              <div className="section-title">Read-only Share Link</div>
+              <ShareLinkControls disabled={shareDisabled} />
+            </section>
+            <section className="tool-panel glass">
+              <div className="section-title">Trade Sheet</div>
+              <textarea className="tool-textarea trade-textarea" value={tradeText} readOnly aria-label="Trade sheet" />
+              <div className="tool-actions tool-actions-wrap">
+                <button className="btn btn-primary" onClick={handleCopyTrade}>{copied ? 'Copied' : 'Copy trade sheet'}</button>
+                <button className="btn btn-ghost" onClick={handleExportTradeCsv}>Export CSV</button>
+              </div>
+            </section>
+          </div>
         </section>
 
         <section className="tool-section">
@@ -365,13 +392,15 @@ export default function Tools({ collection, setRarity, activity, undoLastActivit
             </div>
           </div>
           <section className="tool-panel glass danger-panel">
-            <div>
-              <div className="section-title">Reset Collection</div>
-              <div className="tool-note">Deletes all owned stickers, duplicates, variants, and recent activity for this account.</div>
+            <div className="danger-panel-main">
+              <div>
+                <div className="section-title">Reset Collection</div>
+                <div className="tool-note">Deletes all owned stickers, duplicates, variants, and recent activity for this account.</div>
+              </div>
+              <button className="btn btn-danger" onClick={handleResetCollection} disabled={owned === 0 && duplicates === 0}>
+                Reset collection
+              </button>
             </div>
-            <button className="btn btn-danger" onClick={handleResetCollection} disabled={owned === 0 && duplicates === 0}>
-              Reset collection
-            </button>
             {resetMessage && <div className="tool-warning neutral" role="status">{resetMessage}</div>}
           </section>
         </section>

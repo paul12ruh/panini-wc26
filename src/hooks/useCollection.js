@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import { ALL_STICKERS } from '../data/stickers'
+import { calculateCollectionStats } from '../lib/collectionStats'
 
 const STORAGE_KEY = 'panini-wc2026'
 const STORAGE_META_KEY = `${STORAGE_KEY}:meta`
@@ -305,8 +306,7 @@ export function useCollection() {
     setCollection(normalized)
   }, [])
 
-  const owned = STICKER_IDS.filter(id => collection[id]?.qty > 0).length
-  const duplicates = STICKER_IDS.reduce((sum, id) => sum + Math.max(0, (collection[id]?.qty || 0) - 1), 0)
+  const { owned, duplicates } = calculateCollectionStats(collection)
 
   return {
     collection,
